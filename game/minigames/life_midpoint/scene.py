@@ -1,7 +1,7 @@
 import random
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, WHITE, GRAY, DARK, ACCENT, GOOD, BAD, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND
+from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND
 from ...utils import blit_text_center, clamp
 
 
@@ -89,41 +89,41 @@ class LifeMidpointScene(Scene):
         self.state = "result"
 
     def draw(self, screen):
-        screen.fill(DARK)
+        screen.fill(BG_COLOR)
         subtitle = f"Trouve l'année cible de {self.name}"
-        blit_text_center(screen, self.title_font.render("Sur la frise: vise l'année", True, WHITE), 70)
-        blit_text_center(screen, self.ui_font.render(subtitle, True, GRAY), 96)
+        blit_text_center(screen, self.title_font.render("Sur la frise: vise l'année", True, PRIMARY_COLOR), 70)
+        blit_text_center(screen, self.ui_font.render(subtitle, True, SECONDARY_COLOR), 96)
 
         # Timeline
-        pygame.draw.line(screen, WHITE, self.timeline_rect.topleft, self.timeline_rect.topright, self.timeline_rect.height)
+        pygame.draw.line(screen, PRIMARY_COLOR, self.timeline_rect.topleft, self.timeline_rect.topright, self.timeline_rect.height)
 
         # Ticks and labels (birth, death, and padded bounds)
         for year in (self.min_year, self.birth, self.death, self.max_year):
             x = self.year_to_x(year)
-            pygame.draw.line(screen, GRAY, (x, self.timeline_rect.centery - 8), (x, self.timeline_rect.centery + 8), 2)
-            label = self.large_font.render(str(year), True, WHITE)
+            pygame.draw.line(screen, SECONDARY_COLOR, (x, self.timeline_rect.centery - 8), (x, self.timeline_rect.centery + 8), 2)
+            label = self.large_font.render(str(year), True, PRIMARY_COLOR)
             screen.blit(label, label.get_rect(center=(x, self.timeline_rect.centery - 18)))
 
         # Target marker (only visible after validation)
         if self.state == "result":
             target_x = self.year_to_x(self.target_year)
-            pygame.draw.line(screen, ACCENT, (target_x, self.timeline_rect.centery - 14), (target_x, self.timeline_rect.centery + 14), 2)
+            pygame.draw.line(screen, ACCENT_COLOR, (target_x, self.timeline_rect.centery - 14), (target_x, self.timeline_rect.centery + 14), 2)
 
         # Cursor
-        cursor_color = ACCENT if self.state == "aim" else (200, 200, 200)
+        cursor_color = ACCENT_COLOR if self.state == "aim" else (200, 200, 200)
         pygame.draw.circle(screen, cursor_color, (int(self.cursor_x), self.timeline_rect.centery), 8)
 
         # Instructions
         hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "Appuyez sur ESPACE pour continuer"
-        blit_text_center(screen, self.ui_font.render(hint, True, GRAY), HEIGHT - 26)
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), HEIGHT - 26)
 
         if self.state == "result":
-            chosen = self.large_font.render(f"Votre année: {self.selected_year}", True, WHITE)
+            chosen = self.large_font.render(f"Votre année: {self.selected_year}", True, PRIMARY_COLOR)
             exact_val = int(self.target_year) if isinstance(self.target_year, int) or float(self.target_year).is_integer() else self.target_year
-            exact = self.large_font.render(f"Cible exacte: {exact_val}", True, WHITE)
+            exact = self.large_font.render(f"Cible exacte: {exact_val}", True, PRIMARY_COLOR)
             diff_years = abs(self.selected_year - self.target_year)
-            diff = self.large_font.render(f"Écart: à {int(round(diff_years))} ans près !", True, GOOD if diff_years <= 2 else BAD)
-            score_s = self.large_font.render(f"Score: {self.score}", True, WHITE)
+            diff = self.large_font.render(f"Écart: à {int(round(diff_years))} ans près !", True, GOOD_COLOR if diff_years <= 2 else BAD_COLOR)
+            score_s = self.large_font.render(f"Score: {self.score}", True, PRIMARY_COLOR)
             blit_text_center(screen, chosen, HEIGHT // 2 - 40)
             blit_text_center(screen, exact, HEIGHT // 2 - 10)
             blit_text_center(screen, diff, HEIGHT // 2 + 20)
