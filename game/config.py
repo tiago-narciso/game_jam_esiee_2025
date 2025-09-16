@@ -24,3 +24,20 @@ NOT_CENTER_MSG = "Vous n'êtes pas au centre du jeu."
 
 
 
+# Minigame: Life Midpoint dataset (name, birth_year, death_year)
+CELEBRITIES = [
+    ("Marie Curie", 1867, 1934),
+    ("Isaac Newton", 1643, 1727),
+    ("Albert Einstein", 1879, 1955),
+    ("Léonard de Vinci", 1452, 1519),
+    ("Napoléon Bonaparte", 1769, 1821),
+    ("Cléopâtre", -69, -30),
+    ("Molière", 1622, 1673),
+    ("Victor Hugo", 1802, 1885),
+]
+
+# Life Midpoint minigame settings
+LIFE_KEY_SPEED = 220  # pixels per second left/right
+LIFE_TIMELINE_PADDING_YEARS = 20  # extra years before birth and after death
+LIFE_TARGET_KIND = "random"  # "random" or "midpoint" (for fallback/testing)
+
