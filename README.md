@@ -4,8 +4,9 @@ Mini-jeu réalisé pour la Game Jam 2025 sur le thème : **"Vous n'êtes pas au 
 
 ## 🎮 Description
 Le projet contient plusieurs mini-scènes :
-- **Au centre du mot** : une barre bouge automatiquement et vous devez l'arrêter au centre exact du mot **HISTOIRE**.
-- **La pomme de Newton** : arrêtez la chute d'une pomme exactement à mi-hauteur de sa trajectoire.
+- **Centre du mot** : une barre bouge automatiquement et vous devez l'arrêter au centre exact du mot **HISTOIRE**.
+- **Galerie d'images** : affiche les images placées dans `assets/images/`.
+- **Verre à remplir** : maintenez ESPACE pour remplir un verre d'eau sans déborder.
 
 ## ⚙️ Installation
 ### 1. Cloner le dépôt
@@ -37,42 +38,18 @@ pip install -r requirements.txt
 ## 🚀 Lancer le jeu
 Depuis la racine du projet (avec le venv activé) :
 ```bash
-python -m game.main
-```
-Ou conservez la compatibilité existante :
-```bash
 python game_jam.py
 ```
 
 ## 📂 Arborescence
 ```text
 .
-├─ game/                        # Package principal
-│  ├─ __init__.py
-│  ├─ config.py                 # Constantes et chemins
-│  ├─ core.py                   # Game loop & base Scene
-│  ├─ utils.py                  # Helpers (blit, clamp, load_image/sound)
-│  ├─ main.py                   # Entrypoint (python -m game.main)
-│  ├─ minigames/                # Système de minijeux + enregistrements
-│  │  ├─ __init__.py
-│  │  ├─ base.py                # Interface MiniGame + registre
-│  │  ├─ center_word/           # Mini-jeu "Au centre du mot"
-│  │  │  ├─ __init__.py         # Enregistrement du minijeu
-│  │  │  └─ scene.py            # Scene du mini-jeu
-│  │  └─ newton_apple/          # Mini-jeu "La pomme de Newton"
-│  │     ├─ __init__.py         # Enregistrement du minijeu
-│  │     └─ scene.py            # Scene du mini-jeu
-│  └─ scenes/
-│     ├─ __init__.py
-│     ├─ menu.py                # MenuScene
-│     ├─ center_word.py         # CenterWordScene
-│     └─ session.py             # SessionScene (enchaîne 5 mini-jeux)
-├─ game_jam.py                  # Wrapper: lance game.main
-├─ requirements.txt             # Dépendances Python
+├─ game_jam.py           # Script principal
+├─ requirements.txt      # Dépendances Python
 ├─ assets/
-│  ├─ images/                   # Images pour la galerie
-│  └─ sounds/                   # Effets sonores (click.wav, success.wav, fail.wav)
-└─ README.md                    # Ce fichier
+│  ├─ images/            # Images pour la galerie
+│  └─ sounds/            # Effets sonores (click.wav, success.wav, fail.wav)
+└─ README.md             # Ce fichier
 ```
 
 ## 🎵 Assets
@@ -88,6 +65,15 @@ python game_jam.py
 
 ### Centre du mot
 - `Espace` ou clic : arrêter le curseur
+- `R` : rejouer
+- `M` ou `Échap` : retour menu
+
+### Galerie d’images
+- `← / →` : naviguer entre les images
+- `M` ou `Échap` : retour menu
+
+### Verre à remplir
+- `Espace` : remplir le verre (relâcher pour arrêter)
 - `R` : rejouer
 - `M` ou `Échap` : retour menu
 
