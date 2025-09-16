@@ -21,7 +21,8 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption(TITLE)
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
+        self.game_surface = pygame.Surface((WIDTH, HEIGHT))
         self.clock = pygame.time.Clock()
 
         try:
@@ -58,6 +59,8 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quit()
+                elif event.type == pygame.VIDEORESIZE:
+                    self.screen = pygame.display.set_mode(event.size, pygame.RESIZABLE)
                 else:
                     scene = self.top_scene()
                     if scene:
@@ -65,10 +68,10 @@ class Game:
             scene = self.top_scene()
             if scene:
                 scene.update(dt)
-                scene.draw(self.screen)
+                scene.draw(self.game_surface)
+            
+            # Scale the game surface to the screen size and blit it
+            self.screen.blit(pygame.transform.scale(self.game_surface, self.screen.get_rect().size), (0, 0))
             pygame.display.flip()
         pygame.quit()
         sys.exit(0)
-
-
-

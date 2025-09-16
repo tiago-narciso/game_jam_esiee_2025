@@ -1,6 +1,6 @@
 import pygame
 from ..core import Scene
-from ..config import WHITE, GRAY, DARK, ACCENT, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT
 from ..utils import blit_text_center, load_sound
 
 
@@ -35,19 +35,17 @@ class MenuScene(Scene):
                 fn()
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Menu", True, WHITE), 120)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Menu", True, PRIMARY_COLOR), 120)
         for i, (label, _) in enumerate(self.items):
-            col = ACCENT if i == self.idx else WHITE
+            col = ACCENT_COLOR if i == self.idx else PRIMARY_COLOR
             blit_text_center(screen, self.item_font.render(label, True, col), 220 + i * 44)
         blit_text_center(
             screen,
             self.hint_font.render(
                 "↑/↓ pour naviguer • Entrée pour valider • Échap pour quitter",
                 True,
-                GRAY,
+                SECONDARY_COLOR,
             ),
             HEIGHT - 40,
         )
-
-
