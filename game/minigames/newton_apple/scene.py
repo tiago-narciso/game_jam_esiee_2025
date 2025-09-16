@@ -1,11 +1,11 @@
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, ACCENT, WHITE, DARK, GOOD, BAD, GRAY
-from ...utils import blit_text_center, load_sound, render_not_center_message
+from ...config import WIDTH, HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR
+from ...utils import blit_text_center, load_sound, render_not_center_message, load_image
 
 
 class NewtonAppleScene(Scene):
-    TOLERANCE = 5
+    TOLERANCE = 2
     FALL_SPEED = 150
 
     def __init__(self, game):
@@ -16,11 +16,19 @@ class NewtonAppleScene(Scene):
         self.tree_foliage_color = (34, 139, 34)
         self.newton_color = (70, 130, 180)
         self.apple_color = (255, 0, 0)
-        self.ground_y = HEIGHT - 60
-        self.tree_rect = pygame.Rect(WIDTH // 2 - 150, self.ground_y - 250, 300, 250)
-        self.newton_rect = pygame.Rect(WIDTH // 2 - 20, self.ground_y - 80, 40, 80)
-        self.start_y = self.tree_rect.top + 40
-        self.end_y = self.newton_rect.top - 20
+        self.ground_y = HEIGHT - 50
+        
+        self.tree_img = load_image("assets/images/tree.png", max_w=400, max_h=500)
+        self.tree_rect = self.tree_img.get_rect(midbottom=(WIDTH // 2, self.ground_y))
+
+        self.newton_img = load_image("assets/images/newton.png", max_w=100, max_h=100)
+        self.newton_rect = self.newton_img.get_rect(midbottom=(self.tree_rect.centerx + 30, self.ground_y))
+
+        self.apple_img = load_image("assets/images/apple.png", max_w=30, max_h=30)
+        self.apple_rect = self.apple_img.get_rect()
+
+        self.start_y = self.tree_rect.top + 45
+        self.end_y = self.newton_rect.top + 10
         self.target_y = self.start_y + (self.end_y - self.start_y) / 2
         self.snd_success = load_sound("success.wav")
         self.snd_fail = load_sound("fail.wav")
@@ -71,31 +79,33 @@ class NewtonAppleScene(Scene):
         self.score = max(0, min(100, raw))
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, WHITE), 60)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
         hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "R pour rejouer • clic pour continuer"
-        blit_text_center(screen, self.ui_font.render(hint, True, GRAY), 92)
-        pygame.draw.line(screen, self.tree_foliage_color, (0, self.ground_y), (WIDTH, self.ground_y), 5)
-        pygame.draw.rect(screen, self.tree_trunk_color, (self.tree_rect.centerx - 20, self.tree_rect.bottom - 100, 40, 100))
-        pygame.draw.circle(screen, self.tree_foliage_color, (self.tree_rect.centerx, self.tree_rect.top + 100), 100)
-        pygame.draw.rect(screen, self.newton_color, self.newton_rect)
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
+        
+        # Draw ground behind other objects
+        pygame.draw.rect(screen, self.tree_foliage_color, (0, self.ground_y, WIDTH, HEIGHT - self.ground_y))
+
+        screen.blit(self.tree_img, self.tree_rect)
+        screen.blit(self.newton_img, self.newton_rect)
+
         apple_x = self.tree_rect.centerx + 30
-        pygame.draw.circle(screen, self.apple_color, (apple_x, int(self.apple_y)), 15)
-        pygame.draw.line(screen, ACCENT, (apple_x - 30, self.target_y), (apple_x + 30, self.target_y), 1)
+        self.apple_rect.center = (apple_x, int(self.apple_y))
+        screen.blit(self.apple_img, self.apple_rect)
+        
         diff = abs(self.apple_y - self.target_y)
-        blit_text_center(screen, self.ui_font.render(f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, WHITE), HEIGHT - 28)
+        blit_text_center(screen, self.ui_font.render(f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR), HEIGHT - 28)
         if self.state == "stopped":
             overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render("Parfait !", True, GOOD)
-                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, WHITE)
+                t1 = self.title_font.render("Parfait !", True, GOOD_COLOR)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             else:
                 t1 = render_not_center_message(self.title_font)
-                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, WHITE)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, HEIGHT // 2 - 10)
             blit_text_center(screen, t2, HEIGHT // 2 + 26)
-            blit_text_center(screen, self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, WHITE), HEIGHT // 2 + 50)
-
-
+            blit_text_center(screen, self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, PRIMARY_COLOR), HEIGHT // 2 + 50)

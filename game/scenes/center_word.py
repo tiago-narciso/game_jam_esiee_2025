@@ -1,7 +1,7 @@
 import math
 import pygame
 from ..core import Scene
-from ..config import WHITE, DARK, ACCENT, GOOD, BAD, GRAY, WIDTH, HEIGHT
+from ..config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT
 from ..utils import blit_text_center, load_sound, render_not_center_message
 
 
@@ -17,7 +17,7 @@ class CenterWordScene(Scene):
         self.word_font = pygame.font.SysFont(None, 160, bold=True)
         self.ui_font = pygame.font.SysFont(None, 22)
 
-        self.word_surf = self.word_font.render(self.WORD, True, WHITE)
+        self.word_surf = self.word_font.render(self.WORD, True, PRIMARY_COLOR)
         self.word_rect = self.word_surf.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 20))
         self.true_center_x = self.word_rect.centerx
         # Instead of an external line, we'll fill the text from left to right
@@ -92,14 +92,14 @@ class CenterWordScene(Scene):
         self.score = max(0, min(100, raw))
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Arrête la barre au centre du mot", True, WHITE), 60)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Arrête la barre au centre du mot", True, PRIMARY_COLOR), 60)
         hint = (
             "ESPACE (ou clic) pour ARRÊTER • M: Menu"
             if self.state == "moving"
             else "R pour rejouer • M: Menu"
         )
-        blit_text_center(screen, self.ui_font.render(hint, True, GRAY), 92)
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
 
         # Draw the word, with a fill mask up to cursor_x
         # Base word in desaturated color
@@ -107,7 +107,7 @@ class CenterWordScene(Scene):
         screen.blit(base_surf, self.word_rect.topleft)
 
         # Filled overlay up to fraction
-        filled_color = ACCENT if self.result is None else (GOOD if self.result == "win" else BAD)
+        filled_color = ACCENT_COLOR if self.result is None else (GOOD_COLOR if self.result == "win" else BAD_COLOR)
         filled_surf = self.word_font.render(self.WORD, True, filled_color)
         clip_width = max(0, min(self.word_rect.width, int(self.cursor_x * self.word_rect.width)))
         if clip_width > 0:
@@ -120,7 +120,7 @@ class CenterWordScene(Scene):
         blit_text_center(
             screen,
             self.ui_font.render(
-                f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, WHITE
+                f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR
             ),
             HEIGHT - 28,
         )
@@ -131,21 +131,19 @@ class CenterWordScene(Scene):
             screen.blit(overlay, (0, 0))
             if self.result == "win":
                 t1 = self.title_font.render(
-                    "Parfait ! 50% atteint.", True, GOOD
+                    "Parfait ! 50% atteint.", True, GOOD_COLOR
                 )
                 t2 = self.ui_font.render(
-                    f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, WHITE
+                    f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR
                 )
             else:
                 t1 = render_not_center_message(self.title_font)
                 t2 = self.ui_font.render(
-                    f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, WHITE
+                    f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR
                 )
-            t3 = self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, WHITE)
+            t3 = self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, HEIGHT // 2 - 10)
             blit_text_center(screen, t2, HEIGHT // 2 + 26)
             blit_text_center(screen, t3, HEIGHT // 2 + 50)
-            hint = self.ui_font.render("Clique pour continuer", True, GRAY)
+            hint = self.ui_font.render("Clique pour continuer", True, SECONDARY_COLOR)
             blit_text_center(screen, hint, HEIGHT // 2 + 72)
-
-
