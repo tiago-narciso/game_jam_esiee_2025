@@ -8,12 +8,14 @@ WIDTH, HEIGHT = 960, 540
 FPS = 120
 TITLE = "Game Jam 2025 – Vous n'êtes pas au centre de l'histoire (Pygame)"
 
-WHITE = (240, 240, 240)
-GRAY = (120, 130, 140)
-DARK = (20, 24, 30)
-ACCENT = (120, 200, 255)
-GOOD = (120, 220, 160)
-BAD = (250, 110, 110)
+# --- Palette de couleurs ---
+# https://lospec.com/palette-list/sweetie-16
+BG_COLOR = (26, 28, 44)          # Fond sombre
+PRIMARY_COLOR = (240, 240, 240)  # Texte principal
+SECONDARY_COLOR = (158, 162, 173) # Texte secondaire
+ACCENT_COLOR = (255, 107, 107)   # Accent (sélection, danger)
+GOOD_COLOR = (169, 227, 141)     # Succès
+BAD_COLOR = (255, 107, 107)      # Échec (identique à accent)
 
 ASSETS_DIR = os.path.join("assets")
 IMG_DIR = os.path.join(ASSETS_DIR, "images")
@@ -74,8 +76,8 @@ class MenuScene(Scene):
         super().__init__(game)
         self.items = [
             ("Au centre du mot", lambda: self.game.push_scene(CenterWordScene(self.game))),
+            ("La pomme de Newton", lambda: self.game.push_scene(NewtonScene(self.game))),
             ("Galerie d'images", lambda: self.game.push_scene(GalleryScene(self.game))),
-            ("Verre à remplir", lambda: self.game.push_scene(GlassFillScene(self.game))),
             ("Quitter", lambda: self.game.quit()),
         ]
         self.idx = 0
@@ -100,16 +102,16 @@ class MenuScene(Scene):
                 fn()
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Menu principal", True, WHITE), 120)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Menu principal", True, PRIMARY_COLOR), 120)
         for i, (label, _) in enumerate(self.items):
-            col = ACCENT if i == self.idx else WHITE
+            col = ACCENT_COLOR if i == self.idx else PRIMARY_COLOR
             blit_text_center(screen, self.item_font.render(label, True, col), 220 + i * 44)
-        blit_text_center(screen, self.hint_font.render("↑/↓ pour naviguer • Entrée pour valider • Échap pour quitter", True, GRAY), HEIGHT - 40)
+        blit_text_center(screen, self.hint_font.render("↑/↓ pour naviguer • Entrée pour valider • Échap pour quitter", True, SECONDARY_COLOR), HEIGHT - 40)
 
 class CenterWordScene(Scene):
     WORD = "HISTOIRE"
-    TOLERANCE = 8
+    TOLERANCE = 2
     BASE_SPEED = 320      # px/s
     PADDING = 40          # marge autour du mot
 
@@ -120,7 +122,7 @@ class CenterWordScene(Scene):
         self.ui_font    = pygame.font.SysFont(None, 22)
 
         # rendu du mot & géométrie
-        self.word_surf = self.word_font.render(self.WORD, True, WHITE)
+        self.word_surf = self.word_font.render(self.WORD, True, PRIMARY_COLOR)
         self.word_rect = self.word_surf.get_rect(center=(WIDTH//2, HEIGHT//2 - 20))
         self.true_center_x = self.word_rect.centerx
         self.line_y = self.word_rect.bottom + 28
@@ -184,10 +186,10 @@ class CenterWordScene(Scene):
             if self.snd_fail: self.snd_fail.play()
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Arrête la barre au centre du mot", True, WHITE), 60)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Arrête la barre au centre du mot", True, PRIMARY_COLOR), 60)
         hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "moving" else "R pour rejouer • M: Menu"
-        blit_text_center(screen, self.ui_font.render(hint, True, GRAY), 92)
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
 
         # mot + ligne
         screen.blit(self.word_surf, self.word_rect.topleft)
@@ -199,25 +201,25 @@ class CenterWordScene(Scene):
                          (self.true_center_x, self.line_y + 30), 1)
 
         # curseur auto
-        col = ACCENT if self.result is None else (GOOD if self.result == "win" else BAD)
+        col = ACCENT_COLOR if self.result is None else (GOOD_COLOR if self.result == "win" else BAD_COLOR)
         draw_center_line(screen, int(self.cursor_x), self.line_y, 70, col, 3)
         pygame.draw.circle(screen, col, (int(self.cursor_x), self.line_y), 6)
 
         # HUD
         diff = abs(self.cursor_x - self.true_center_x)
         blit_text_center(screen, self.ui_font.render(
-            f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, WHITE), HEIGHT - 28)
+            f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR), HEIGHT - 28)
 
         # overlay résultat
         if self.state == "stopped":
             overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150)); screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render("Parfait ! Vous êtes au centre de l'histoire.", True, GOOD)
-                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, WHITE)
+                t1 = self.title_font.render("Parfait ! Vous êtes au centre de l'histoire.", True, GOOD_COLOR)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             else:
-                t1 = self.title_font.render("Perdu : Vous n'êtes pas au centre de l'histoire.", True, BAD)
-                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, WHITE)
+                t1 = self.title_font.render("Perdu : Vous n'êtes pas au centre de l'histoire.", True, BAD_COLOR)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, HEIGHT//2 - 10)
             blit_text_center(screen, t2, HEIGHT//2 + 26)
 
@@ -258,104 +260,130 @@ class GalleryScene(Scene):
                 if self.snd_click: self.snd_click.play()
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Galerie d'images", True, WHITE), 60)
-        blit_text_center(screen, self.ui_font.render("←/→ pour naviguer • M: Menu", True, GRAY), 92)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Galerie d'images", True, PRIMARY_COLOR), 60)
+        blit_text_center(screen, self.ui_font.render("←/→ pour naviguer • M: Menu", True, SECONDARY_COLOR), 92)
 
         img = self.images[self.idx]
         name = self.names[self.idx]
         rect = img.get_rect(center=(WIDTH//2, HEIGHT//2 + 10))
         screen.blit(img, rect)
 
-        blit_text_center(screen, self.ui_font.render(name, True, WHITE), rect.bottom + 24)
+        blit_text_center(screen, self.ui_font.render(name, True, PRIMARY_COLOR), rect.bottom + 24)
 
-class GlassFillScene(Scene):
+class NewtonScene(Scene):
+    TOLERANCE = 5       # Tolérance en pixels pour le "milieu"
+    FALL_SPEED = 150    # Vitesse de chute de la pomme en px/s
+
     def __init__(self, game):
         super().__init__(game)
         self.title_font = pygame.font.SysFont(None, 40, bold=True)
         self.ui_font = pygame.font.SysFont(None, 22)
-        self.level = 0.0     # 0..1
-        self.speed = 0.35    # vitesse de remplissage par seconde
-        self.state = "play"  # play | win | lose
 
+        # Couleurs pour le style arcade
+        self.tree_trunk_color = (139, 69, 19)
+        self.tree_foliage_color = (34, 139, 34)
+        self.newton_color = (70, 130, 180)
+        self.apple_color = (255, 0, 0)
+
+        # Géométrie de la scène
+        self.ground_y = HEIGHT - 60
+        self.tree_rect = pygame.Rect(WIDTH // 2 - 150, self.ground_y - 250, 300, 250)
+        self.newton_rect = pygame.Rect(WIDTH // 2 - 20, self.ground_y - 80, 40, 80)
+        
+        self.start_y = self.tree_rect.top + 40
+        self.end_y = self.newton_rect.top - 20
+        self.target_y = self.start_y + (self.end_y - self.start_y) / 2
+
+        # Sons
         self.snd_success = load_sound("success.wav")
         self.snd_fail = load_sound("fail.wav")
+        self.snd_click = load_sound("click.wav")
 
-        # géométrie du "verre"
-        self.glass_rect = pygame.Rect(0, 0, 160, 260)
-        self.glass_rect.center = (WIDTH//2, HEIGHT//2 + 40)
-        self.fill_margin = 16  # marge intérieure pour l'eau
+        self.reset()
 
     def reset(self):
-        self.level = 0.0
-        self.state = "play"
+        self.state = "falling"  # falling -> stopped
+        self.apple_y = self.start_y
+        self.result = None
+        self.error_px = None
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
             if e.key in (pygame.K_m, pygame.K_ESCAPE):
                 self.game.pop_scene()
-            elif e.key == pygame.K_r and self.state != "play":
+            elif e.key == pygame.K_r and self.state == "stopped":
                 self.reset()
+            elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
+                if self.state == "falling":
+                    self.validate()
+                    self.state = "stopped"
+        elif e.type == pygame.MOUSEBUTTONDOWN:
+            if self.state == "falling":
+                self.validate()
+                self.state = "stopped"
 
     def update(self, dt):
-        if self.state != "play":
+        if self.state != "falling":
             return
-        keys = pygame.key.get_pressed()
+        
+        self.apple_y += self.FALL_SPEED * dt
+        if self.apple_y >= self.end_y:
+            self.apple_y = self.end_y
+            self.validate()
+            self.state = "stopped"
 
-        # Espace maintenu = on remplit
-        if keys[pygame.K_SPACE]:
-            self.level += self.speed * dt
-        else:
-            # légère évaporation pour ajouter du contrôle
-            self.level = max(0.0, self.level - 0.15 * dt)
-
-        self.level = clamp(self.level, 0.0, 1.15)  # autorise un léger dépassement pour l'échec
-
-        # conditions de victoire/défaite
-        if self.level >= 1.0 and self.level <= 1.02:
-            self.state = "win"
+    def validate(self):
+        if self.snd_click: self.snd_click.play()
+        self.error_px = abs(self.apple_y - self.target_y)
+        if self.error_px <= self.TOLERANCE:
+            self.result = "win"
             if self.snd_success: self.snd_success.play()
-        elif self.level > 1.05:
-            self.state = "lose"
+        else:
+            self.result = "lose"
             if self.snd_fail: self.snd_fail.play()
 
     def draw(self, screen):
-        screen.fill(DARK)
-        blit_text_center(screen, self.title_font.render("Verre à remplir", True, WHITE), 60)
-        blit_text_center(screen, self.ui_font.render("Maintiens ESPACE pour remplir • Vise le trait • M: Menu", True, GRAY), 92)
+        screen.fill(BG_COLOR)
+        blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
+        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "R pour rejouer • M: Menu"
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
 
-        # Verre
-        pygame.draw.rect(screen, (200, 200, 200), self.glass_rect, width=3, border_radius=10)
+        # Sol
+        pygame.draw.line(screen, self.tree_foliage_color, (0, self.ground_y), (WIDTH, self.ground_y), 5)
 
-        # Trait objectif (niveau 100%)
-        target_y = self.glass_rect.top + 20
-        pygame.draw.line(screen, (220, 180, 80), (self.glass_rect.left + 6, target_y),
-                         (self.glass_rect.right - 6, target_y), 3)
+        # Arbre (style arcade)
+        pygame.draw.rect(screen, self.tree_trunk_color, (self.tree_rect.centerx - 20, self.tree_rect.bottom - 100, 40, 100))
+        pygame.draw.circle(screen, self.tree_foliage_color, (self.tree_rect.centerx, self.tree_rect.top + 100), 100)
 
-        # Eau
-        inner = self.glass_rect.inflate(-self.fill_margin, -self.fill_margin)
-        max_h = inner.height
-        h = clamp(int(max_h * clamp(self.level, 0, 1.15)), 0, int(max_h * 1.15))
-        water_rect = pygame.Rect(inner.left, inner.bottom - h, inner.width, h)
-        pygame.draw.rect(screen, (80, 160, 255), water_rect, border_radius=6)
+        # Newton (style arcade)
+        pygame.draw.rect(screen, self.newton_color, self.newton_rect)
+
+        # Pomme
+        apple_x = self.tree_rect.centerx + 30
+        pygame.draw.circle(screen, self.apple_color, (apple_x, int(self.apple_y)), 15)
+
+        # Ligne de milieu (aide visuelle)
+        pygame.draw.line(screen, ACCENT_COLOR, (apple_x - 30, self.target_y), (apple_x + 30, self.target_y), 1)
 
         # HUD
-        perc = int(clamp(self.level, 0.0, 1.15) * 100)
-        blit_text_center(screen, self.ui_font.render(f"Niveau: {perc}%", True, WHITE), HEIGHT - 28)
+        diff = abs(self.apple_y - self.target_y)
+        blit_text_center(screen, self.ui_font.render(
+            f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR), HEIGHT - 28)
 
-        if self.state != "play":
+        # Overlay résultat
+        if self.state == "stopped":
             overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
-            if self.state == "win":
-                t1 = self.title_font.render("Parfait !", True, GOOD)
-                t2 = self.ui_font.render("Pile au niveau du trait. R pour rejouer • M pour menu", True, WHITE)
+            if self.result == "win":
+                t1 = self.title_font.render("Parfait ! En plein milieu de l'histoire.", True, GOOD_COLOR)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             else:
-                t1 = self.title_font.render("Débordement !", True, BAD)
-                t2 = self.ui_font.render("Trop rempli… R pour rejouer • M pour menu", True, WHITE)
-            blit_text_center(screen, t1, HEIGHT//2 - 10)
-            blit_text_center(screen, t2, HEIGHT//2 + 26)
-
+                t1 = self.title_font.render("Perdu ! Ce n'était pas le milieu de l'histoire.", True, BAD_COLOR)
+                t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR)
+            blit_text_center(screen, t1, HEIGHT // 2 - 10)
+            blit_text_center(screen, t2, HEIGHT // 2 + 26)
 
 # ------------------ Boucle principale ------------------
 class Game:
