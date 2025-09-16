@@ -18,20 +18,34 @@ def draw_center_line(surface, x, y, height, color, thickness=3):
 
 def load_image(path, max_w=720, max_h=400):
     if os.path.isfile(path):
-        img = pygame.image.load(path).convert_alpha()
-        w, h = img.get_size()
-        scale = min(max_w / w, max_h / h, 1.0)
-        if scale != 1.0:
-            img = pygame.transform.smoothscale(img, (int(w * scale), int(h * scale)))
-        return img
-    else:
-        surf = pygame.Surface((max_w, int(max_h * 0.75)), pygame.SRCALPHA)
-        surf.fill((40, 44, 52))
-        pygame.draw.rect(surf, (70, 80, 90), surf.get_rect(), 3, border_radius=12)
-        font = pygame.font.SysFont(None, 28, bold=True)
-        txt = font.render("Image manquante", True, (200, 200, 200))
-        surf.blit(txt, txt.get_rect(center=surf.get_rect().center))
-        return surf
+        img = None
+        try:
+            img = pygame.image.load(path).convert_alpha()
+        except Exception:
+            # Fallback via Pillow in case the file extension doesn't match actual encoding
+            try:
+                from PIL import Image
+                pil_img = Image.open(path).convert("RGBA")
+                mode = pil_img.mode
+                size = pil_img.size
+                data = pil_img.tobytes()
+                img = pygame.image.fromstring(data, size, mode)
+            except Exception:
+                img = None
+        if img is not None:
+            w, h = img.get_size()
+            scale = min(max_w / w, max_h / h, 1.0)
+            if scale != 1.0:
+                img = pygame.transform.smoothscale(img, (int(w * scale), int(h * scale)))
+            return img
+    # Placeholder surface when file missing or failed to load
+    surf = pygame.Surface((max_w, int(max_h * 0.75)), pygame.SRCALPHA)
+    surf.fill((40, 44, 52))
+    pygame.draw.rect(surf, (70, 80, 90), surf.get_rect(), 3, border_radius=12)
+    font = pygame.font.SysFont(None, 28, bold=True)
+    txt = font.render("Image manquante", True, (200, 200, 200))
+    surf.blit(txt, txt.get_rect(center=surf.get_rect().center))
+    return surf
 
 
 def load_sound(name):
