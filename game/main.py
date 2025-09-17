@@ -1,7 +1,7 @@
 import random
 from .core import Game
 from .scenes.menu import MenuScene
-from .scenes.center_word import CenterWordScene
+from .minigames.center_word import CenterWordScene
 from .scenes.session import SessionScene
 from .minigames.newton_apple.scene import NewtonAppleScene
 from .minigames import get_all_minigames
