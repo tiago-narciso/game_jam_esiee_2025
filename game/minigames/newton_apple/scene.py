@@ -49,18 +49,16 @@ class NewtonAppleScene(Scene):
                 self.reset()
             elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "falling":
-                    self.validate(); self.state = "stopped"
+                    self.validate()
+                    self.state = "stopped"
                 elif self.state == "stopped":
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
-            elif self.state == "stopped":
-                score = getattr(self, "score", 0)
-                success = (self.result == "win")
-                self.game.complete_minigame(score, success)
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "falling":
-                self.validate(); self.state = "stopped"
+                self.validate()
+                self.state = "stopped"
             elif self.state == "stopped":
                 score = getattr(self, "score", 0)
                 self.game.complete_minigame(score, self.result == "win")
@@ -71,7 +69,8 @@ class NewtonAppleScene(Scene):
         self.apple_y += self.FALL_SPEED * dt
         if self.apple_y >= self.end_y:
             self.apple_y = self.end_y
-            self.validate(); self.state = "stopped"
+            self.validate()
+            self.state = "stopped"
 
     def validate(self):
         if self.snd_click: self.snd_click.play()

@@ -2,8 +2,8 @@ import os
 import random
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, IMG_DIR, FONT_PATH
-from ...utils import blit_text_center, load_image, load_sound
+from ...config import GAME_WIDTH, GAME_HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, IMG_DIR, FONT_PATH
+from ...utils import blit_text_center, load_image, load_sound, draw_attempts
 
 
 def blit_fit(surface, img, rect):
@@ -86,8 +86,8 @@ class ComicScene(Scene):
     def compute_layout(self):
         """Layout 4 (haut) + 3 (bas), CENTRÉ horizontalement et verticalement,
         en maximisant la taille sans couper."""
-        usable_w = WIDTH - 2 * self.MARGIN_SIDE
-        usable_h = HEIGHT - self.MARGIN_TOP - self.MARGIN_BOTTOM
+        usable_w = GAME_WIDTH - 2 * self.MARGIN_SIDE
+        usable_h = GAME_HEIGHT - self.MARGIN_TOP - self.MARGIN_BOTTOM
 
         # Taille brute depuis la hauteur (2 rangées + 1 gouttière)
         tile_h = max(60, int((usable_h - self.GUTTER_Y) / 2))
@@ -132,10 +132,9 @@ class ComicScene(Scene):
                 self.game.pop_scene()
             elif e.key == pygame.K_r and self.state == "stopped":
                 self.reset()
-            elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
+            elif e.key == pygame.K_SPACE or e.key == pygame.K_RETURN:
                 if self.state == "moving":
                     self.validate()
-                    self.state = "stopped"
                 elif self.state == "stopped":
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
@@ -143,7 +142,6 @@ class ComicScene(Scene):
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "moving":
                 self.validate()
-                self.state = "stopped"
             elif self.state == "stopped":
                 # On click after finish, report score and leave
                 self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
@@ -222,15 +220,15 @@ class ComicScene(Scene):
             self.score = 0
             self.result = "lose"
             if self.snd_fail: self.snd_fail.play()
-        score = getattr(self, "score", 0)
-        success = (self.result == "win")
-        self.game.complete_minigame(score, success)
 
     def draw(self, screen):
         self.tile_rects = self.compute_layout()
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Quel est le milieu de l'histoire ?", True, PRIMARY_COLOR), 64)
         blit_text_center(screen, self.ui_font.render("ESPACE/Click pour valider • M: Menu • R: Rejouer", True, SECONDARY_COLOR), 96)
+        
+        # Draw attempts HUD
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         # dessine les 7 cases suivant l'ordre mélangé
         for grid_idx, rect in enumerate(self.tile_rects):
@@ -240,7 +238,7 @@ class ComicScene(Scene):
         print(self.state, self.result, self.score)
         # overlay résultat
         if self.state == "stopped":
-            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay = pygame.Surface((GAME_WIDTH, GAME_HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
@@ -250,9 +248,9 @@ class ComicScene(Scene):
                 t1 = self.title_font.render("Vous n'êtes pas au milieu de l'histoire !!", True, BAD_COLOR)
                 ans = os.path.basename(self.story_middle_path) if self.story_middle_path else "N/A"
                 t2 = self.ui_font.render(f"La case du milieu était : {ans}  •  ESPACE/clic pour continuer • R pour rejouer • M pour menu", True, PRIMARY_COLOR)
-            blit_text_center(screen, t1, HEIGHT // 2 - 10)
-            blit_text_center(screen, t2, HEIGHT // 2 + 26)
+            blit_text_center(screen, t1, GAME_HEIGHT // 2 - 10)
+            blit_text_center(screen, t2, GAME_HEIGHT // 2 + 26)
             
             # Affichage du score
             t3 = self.ui_font.render(f"Score : {self.score}", True, ACCENT_COLOR)
-            blit_text_center(screen, t3, HEIGHT // 2 + 60)
+            blit_text_center(screen, t3, GAME_HEIGHT // 2 + 60)
