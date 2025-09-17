@@ -136,6 +136,8 @@ class ComicScene(Scene):
                 if self.state == "moving":
                     self.validate()
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self.validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
@@ -143,7 +145,8 @@ class ComicScene(Scene):
             if self.state == "moving":
                 self.validate()
             elif self.state == "stopped":
-                # On click after finish, report score and leave
+                # Don't play sounds when clicking to continue
+                self.validate(play_sounds=False)
                 self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
 
     def reset(self):
@@ -189,8 +192,8 @@ class ComicScene(Scene):
             pygame.draw.rect(hi, (*ACCENT_COLOR[:3], alpha), hi.get_rect(), 6, border_radius=18)
             screen.blit(hi, rect.topleft)
 
-    def validate(self):
-        if self.snd_click: self.snd_click.play()
+    def validate(self, play_sounds=True):
+        if play_sounds and self.snd_click: self.snd_click.play()
         self.state = "stopped"
         if not self.paths:
             self.result = "lose"
@@ -203,23 +206,23 @@ class ComicScene(Scene):
         if distance == 0:
             self.score = 100
             self.result = "win"
-            if self.snd_success: self.snd_success.play()
+            if play_sounds and self.snd_success: self.snd_success.play()
         elif distance == 1:
             self.score = 80
             self.result = "lose"
-            if self.snd_fail: self.snd_fail.play()
+            if play_sounds and self.snd_fail: self.snd_fail.play()
         elif distance == 2:
             self.score = 60
             self.result = "lose"
-            if self.snd_fail: self.snd_fail.play()
+            if play_sounds and self.snd_fail: self.snd_fail.play()
         elif distance == 3:
             self.score = 40
             self.result = "lose"
-            if self.snd_fail: self.snd_fail.play()
+            if play_sounds and self.snd_fail: self.snd_fail.play()
         else:
             self.score = 0
             self.result = "lose"
-            if self.snd_fail: self.snd_fail.play()
+            if play_sounds and self.snd_fail: self.snd_fail.play()
 
     def draw(self, screen):
         self.tile_rects = self.compute_layout()

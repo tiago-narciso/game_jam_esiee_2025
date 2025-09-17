@@ -3,7 +3,7 @@ import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT, FONT_PATH
 from ..minigames import get_all_minigames
-from ..utils import blit_text_center
+from ..utils import blit_text_center, load_sound
 from ..leaderboard import add_score
 from .leaderboard import LeaderboardScene
 
@@ -28,6 +28,10 @@ class SessionScene(Scene):
         self.current_best_score = 0
         # Attempts management (shared HUD state on game)
         self.game.current_attempts_left = None
+        # Sounds: only play fail on attempt loss; success sfx handled inside minigames
+        self.snd_fail_attempt = load_sound("fail.wav")
+        # Play cadence: play on first failure, then one out of two
+        self._fail_play_count = 0
 
     def _push_next_if_needed(self):
         if self.index < len(self.queue) and not self.active:
@@ -72,6 +76,13 @@ class SessionScene(Scene):
                 if self.game.current_attempts_left is None:
                     self.game.current_attempts_left = self.game.max_attempts_per_game
                 self.game.current_attempts_left -= 1
+                # Play error only on first failure, then every other failure
+                if (self._fail_play_count % 2) == 0 and self.snd_fail_attempt:
+                    try:
+                        self.snd_fail_attempt.play()
+                    except Exception:
+                        pass
+                self._fail_play_count += 1
                 if self.game.current_attempts_left <= 0:
                     # out of attempts: advance
                     self.scores.append(self.current_best_score)
