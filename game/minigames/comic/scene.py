@@ -235,7 +235,7 @@ class ComicScene(Scene):
             img_idx = self.grid_order[grid_idx]
             img = self.images[img_idx]
             self.draw_tile(screen, rect, img, highlighted=(self.state == "moving" and grid_idx == self.current_idx))
-        print(self.state, self.result, self.score)
+
         # overlay résultat
         if self.state == "stopped":
             overlay = pygame.Surface((GAME_WIDTH, GAME_HEIGHT), pygame.SRCALPHA)
