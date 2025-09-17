@@ -5,6 +5,8 @@ from .scenes.username import UsernameScene
 from .scenes.leaderboard import LeaderboardScene
 from .scenes.session import SessionScene
 from .minigames.newton_apple.scene import NewtonAppleScene
+from .minigames.comic.scene import ComicScene
+from .minigames import get_all_minigames
 
 
 def create_game_with_menu():
@@ -21,8 +23,8 @@ def create_game_with_menu():
     menu.set_menu_items(
         [
             ("Jouer", start_session),
-            ("Test Newton", lambda: game.push_scene(NewtonAppleScene(game))),
-            ("Leaderboard", lambda: game.push_scene(LeaderboardScene(game))),
+            ("Test BD", lambda: game.push_scene(ComicScene(game))),
+            ("Leaderboard (à venir)", lambda: None),
             ("Quitter", lambda: game.quit()),
         ]
     )
