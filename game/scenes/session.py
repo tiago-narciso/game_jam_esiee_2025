@@ -28,7 +28,6 @@ class SessionScene(Scene):
         self.current_best_score = 0
         # Attempts management (shared HUD state on game)
         self.game.current_attempts_left = None
-        self._push_next_if_needed()
 
     def _push_next_if_needed(self):
         if self.index < len(self.queue) and not self.active:
@@ -46,6 +45,10 @@ class SessionScene(Scene):
             self.game.pop_scene()
 
     def update(self, dt):
+        # If not currently in a minigame, push the next one
+        if not self.active:
+            self._push_next_if_needed()
+            return
         # If the top is back to this session, then the minigame ended (popped itself)
         if self.active and self.game.top_scene() is self:
             # collect score and result for this attempt
