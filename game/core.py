@@ -1,7 +1,7 @@
 import sys
 import pygame
 from .config import WIDTH, HEIGHT, FPS, TITLE, GAME_WIDTH, GAME_HEIGHT
-from .utils import draw_80s_computer_frame, get_game_area_rect
+from .utils import draw_80s_computer_frame, get_game_area_rect, create_scanlines
 
 
 class Scene:
@@ -24,6 +24,7 @@ class Game:
         pygame.display.set_caption(TITLE)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         self.game_surface = pygame.Surface((GAME_WIDTH, GAME_HEIGHT))
+        self.scanlines = create_scanlines(GAME_WIDTH, GAME_HEIGHT)
         self.clock = pygame.time.Clock()
 
         try:
@@ -83,6 +84,7 @@ class Game:
             
             # Blit the game content into the frame
             game_area = get_game_area_rect()
+            self.game_surface.blit(self.scanlines, (0, 0))
             frame_surface.blit(self.game_surface, (game_area.x, game_area.y))
             
             # Scale the frame surface to the screen size and blit it
