@@ -7,6 +7,7 @@ from ...utils import blit_text_center, clamp, draw_attempts
 
 class LifeMidpointScene(Scene):
     CURSOR_SPEED = LIFE_KEY_SPEED  # pixels per second for keyboard
+    TOLERANCE_YEARS = 2  # years within target for success
 
     def __init__(self, game):
         super().__init__(game)
@@ -20,10 +21,10 @@ class LifeMidpointScene(Scene):
         self.death = death
         self.min_year = self.birth - LIFE_TIMELINE_PADDING_YEARS
         self.max_year = self.death + LIFE_TIMELINE_PADDING_YEARS
-        self.timeline_rect = pygame.Rect(120, HEIGHT // 2 + 20, WIDTH - 240, 6)
+        self.timeline_rect = pygame.Rect(120, HEIGHT // 2 + 20, WIDTH - 240, 8)
         # Target year: random within life by default, or midpoint when configured
         if LIFE_TARGET_KIND == "midpoint":
-            self.target_year = (self.birth + self.death) / 2
+            self.target_year = int((self.birth + self.death) / 2)
         else:
             self.target_year = random.randint(self.birth, self.death)
         # Start cursor at the leftmost visible bound
@@ -33,6 +34,7 @@ class LifeMidpointScene(Scene):
         self.state = "aim"
         self.selected_year = None
         self.score = 0
+        self.difficulty_multiplier = 1.0
 
     def year_to_x(self, year):
         # Map [min_year..max_year] to [timeline.left..timeline.right]
@@ -67,7 +69,12 @@ class LifeMidpointScene(Scene):
                 self.holding_left = False
             elif e.key in (pygame.K_RIGHT, pygame.K_d):
                 self.holding_right = False
-        # Mouse input disabled for this game mode
+        elif e.type == pygame.MOUSEBUTTONDOWN and self.state == "aim":
+            if e.button == 1:  # Left click
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if self.timeline_rect.collidepoint(mouse_x, mouse_y):
+                    self.cursor_x = mouse_x
+                    self.validate_selection()
 
     def update(self, dt):
         if self.state != "aim":
@@ -87,14 +94,13 @@ class LifeMidpointScene(Scene):
         error_years = abs(self.selected_year - self.target_year)
         visible_span = max(1, abs(self.max_year - self.min_year))
         precision = max(0.0, 1.0 - (error_years / (visible_span / 2)))
-        self.score = int(100 * precision)
+        self.score = int(100 * precision * self.difficulty_multiplier)
         self.state = "result"
 
     def _is_success(self):
-        # Consider success when error within 2 years
         if self.selected_year is None:
             return False
-        return abs(self.selected_year - self.target_year) <= 2
+        return abs(self.selected_year - self.target_year) <= self.TOLERANCE_YEARS
 
     def draw(self, screen):
         screen.fill(BG_COLOR)
@@ -102,40 +108,58 @@ class LifeMidpointScene(Scene):
         blit_text_center(screen, self.title_font.render("Sur la frise: vise l'année", True, PRIMARY_COLOR), 70)
         blit_text_center(screen, self.ui_font.render(subtitle, True, SECONDARY_COLOR), 96)
 
-        # Timeline
-        pygame.draw.line(screen, PRIMARY_COLOR, self.timeline_rect.topleft, self.timeline_rect.topright, self.timeline_rect.height)
+        # Timeline background
+        pygame.draw.rect(screen, (40, 40, 60), self.timeline_rect)
+        pygame.draw.rect(screen, PRIMARY_COLOR, self.timeline_rect, 2)
 
         # Ticks and labels (birth, death, and padded bounds)
         for year in (self.min_year, self.birth, self.death, self.max_year):
             x = self.year_to_x(year)
-            pygame.draw.line(screen, SECONDARY_COLOR, (x, self.timeline_rect.centery - 8), (x, self.timeline_rect.centery + 8), 2)
-            label = self.large_font.render(str(year), True, PRIMARY_COLOR)
-            screen.blit(label, label.get_rect(center=(x, self.timeline_rect.centery - 18)))
+            color = ACCENT_COLOR if year in (self.birth, self.death) else SECONDARY_COLOR
+            pygame.draw.line(screen, color, (x, self.timeline_rect.centery - 12), (x, self.timeline_rect.centery + 12), 3)
+            label = self.large_font.render(str(year), True, color)
+            screen.blit(label, label.get_rect(center=(x, self.timeline_rect.centery - 25)))
 
         # Target marker (only visible after validation)
         if self.state == "result":
             target_x = self.year_to_x(self.target_year)
-            pygame.draw.line(screen, ACCENT_COLOR, (target_x, self.timeline_rect.centery - 14), (target_x, self.timeline_rect.centery + 14), 2)
+            pygame.draw.line(screen, ACCENT_COLOR, (target_x, self.timeline_rect.centery - 16), (target_x, self.timeline_rect.centery + 16), 4)
+            pygame.draw.circle(screen, ACCENT_COLOR, (int(target_x), self.timeline_rect.centery), 6)
 
         # Cursor
         cursor_color = ACCENT_COLOR if self.state == "aim" else (200, 200, 200)
         pygame.draw.circle(screen, cursor_color, (int(self.cursor_x), self.timeline_rect.centery), 8)
 
+
         # Instructions
-        hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "ESPACE pour continuer"
+        hint = "←/→ pour viser • ESPACE/clic pour valider • M: menu" if self.state == "aim" else "ESPACE pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), HEIGHT - 26)
         draw_attempts(screen, self.game, pos=(None, 26))
 
         if self.state == "result":
+            # Result overlay
+            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 150))
+            screen.blit(overlay, (0, 0))
+            
+            diff_years = abs(self.selected_year - self.target_year)
+            is_success = diff_years <= self.TOLERANCE_YEARS
+            
+            # Result title
+            result_text = "Parfait !" if is_success else "Presque !"
+            result_color = GOOD_COLOR if is_success else BAD_COLOR
+            blit_text_center(screen, self.title_font.render(result_text, True, result_color), HEIGHT // 2 - 60)
+            
+            # Details
             chosen = self.large_font.render(f"Votre année: {self.selected_year}", True, PRIMARY_COLOR)
             exact_val = int(self.target_year) if isinstance(self.target_year, int) or float(self.target_year).is_integer() else self.target_year
             exact = self.large_font.render(f"Cible exacte: {exact_val}", True, PRIMARY_COLOR)
-            diff_years = abs(self.selected_year - self.target_year)
-            diff = self.large_font.render(f"Écart: à {int(round(diff_years))} ans près !", True, GOOD_COLOR if diff_years <= 2 else BAD_COLOR)
+            diff = self.large_font.render(f"Écart: {int(round(diff_years))} ans", True, result_color)
             score_s = self.large_font.render(f"Score: {self.score}", True, PRIMARY_COLOR)
-            blit_text_center(screen, chosen, HEIGHT // 2 - 40)
-            blit_text_center(screen, exact, HEIGHT // 2 - 10)
-            blit_text_center(screen, diff, HEIGHT // 2 + 20)
-            blit_text_center(screen, score_s, HEIGHT // 2 + 50)
+            
+            blit_text_center(screen, chosen, HEIGHT // 2 - 20)
+            blit_text_center(screen, exact, HEIGHT // 2 + 10)
+            blit_text_center(screen, diff, HEIGHT // 2 + 40)
+            blit_text_center(screen, score_s, HEIGHT // 2 + 70)
 
 
