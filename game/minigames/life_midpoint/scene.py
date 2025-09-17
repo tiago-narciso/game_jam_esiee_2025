@@ -7,7 +7,7 @@ from ...utils import blit_text_center, clamp, draw_attempts
 
 class LifeMidpointScene(Scene):
     CURSOR_SPEED = LIFE_KEY_SPEED  # pixels per second for keyboard
-    TOLERANCE_YEARS = 2  # years within target for success
+    TOLERANCE_YEARS = 1  # years within target for success
 
     def __init__(self, game):
         super().__init__(game)
