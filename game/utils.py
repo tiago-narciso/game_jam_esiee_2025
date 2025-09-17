@@ -75,7 +75,7 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     inner_rect = outer_rect.inflate(-bezel_thickness * 2, -bezel_thickness * 2)
     
     # Draw main bezel (only border, not filled)
-    pygame.draw.rect(frame, dark_gray, outer_rect, width=bezel_thickness, border_radius=20)
+    pygame.draw.rect(frame, dark_gray, outer_rect, width=bezel_thickness, border_radius=0)
     
     # Inner accent line
     pygame.draw.rect(frame, medium_gray, inner_rect, width=6, border_radius=0)
@@ -127,8 +127,6 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     # Corner screws (decorative)
     screw_color = (120, 120, 125, 200)
     screw_positions = [
-        # (bezel_thickness + 10, bezel_thickness + 10),
-        # (width - bezel_thickness - 10, bezel_thickness + 10),
         (bezel_thickness + 10, height - bezel_thickness - 10),
         (width - bezel_thickness - 10, height - bezel_thickness - 10)
     ]

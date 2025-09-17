@@ -46,10 +46,10 @@ class LeaderboardScene(Scene):
                 line = f"#{rank} — {self.highlight_username} — {self.highlight_score}"
                 blit_text_center(screen, self.row_font.render(line, True, ACCENT_COLOR), y + 16)
 
-        blit_text_center(
-            screen,
-            self.hint_font.render("Entrée/Espace/Échap pour revenir au menu", True, SECONDARY_COLOR),
-            HEIGHT - 40,
-        )
+        # blit_text_center(
+        #     screen,
+        #     self.hint_font.render("Entrée/Espace/Échap pour revenir au menu", True, SECONDARY_COLOR),
+        #     HEIGHT - 40,
+        # )
 
 
