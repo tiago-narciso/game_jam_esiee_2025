@@ -1,7 +1,7 @@
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR
-from ...utils import blit_text_center, load_sound, render_not_center_message, load_image
+from ...utils import blit_text_center, load_sound, render_not_center_message, load_image, draw_attempts
 
 
 class NewtonAppleScene(Scene):
@@ -55,7 +55,7 @@ class NewtonAppleScene(Scene):
                 self.validate(); self.state = "stopped"
             elif self.state == "stopped":
                 score = getattr(self, "score", 0)
-                self.game.complete_minigame(score)
+                self.game.complete_minigame(score, self.result == "win")
 
     def update(self, dt):
         if self.state != "falling":
@@ -83,6 +83,7 @@ class NewtonAppleScene(Scene):
         blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
         hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "R pour rejouer • clic pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
+        draw_attempts(screen, self.game, pos=(None, 26))
         
         # Draw ground behind other objects
         pygame.draw.rect(screen, self.tree_foliage_color, (0, self.ground_y, WIDTH, HEIGHT - self.ground_y))

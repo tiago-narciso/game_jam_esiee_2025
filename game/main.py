@@ -12,7 +12,7 @@ def create_game_with_menu():
     menu = MenuScene(game)
 
     def start_session():
-        game.push_scene(SessionScene(game, num_games=5))
+        game.push_scene(SessionScene(game))
 
     menu.set_menu_items(
         [

@@ -4,7 +4,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, IMG_DIR
-from ...utils import blit_text_center, load_image, load_sound, render_not_center_message
+from ...utils import blit_text_center, load_image, load_sound, render_not_center_message, draw_attempts
 from .data import IPHONE_MODELS
 
 
@@ -71,7 +71,7 @@ class TimelineMiddleScene(Scene):
                 self._validate(); self.state = "stopped"
             elif self.state == "stopped":
                 score = getattr(self, "score", 0)
-                self.game.complete_minigame(score)
+                self.game.complete_minigame(score, self.result == "win")
 
     def _reset(self):
         self.scroll_x = 0.0
@@ -126,6 +126,7 @@ class TimelineMiddleScene(Scene):
         blit_text_center(screen, self.title_font.render("Stoppe au milieu de l'histoire (iPhone)", True, PRIMARY_COLOR), 56)
         hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "scrolling" else "R pour rejouer • clic pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 86)
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         # Draw cards horizontally with current scroll offset
         card_span = self.CARD_W + self.GAP

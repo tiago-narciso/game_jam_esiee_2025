@@ -32,8 +32,12 @@ class Game:
 
         self.scenes = []
         self.running = True
-        # Minigame score channel: minigames set this before popping themselves
+        # Minigame result channel: set by minigames before they pop themselves
         self.last_minigame_score = None
+        self.last_minigame_success = None
+        # Attempts HUD shared state (read-only for minigames)
+        self.max_attempts_per_game = 3
+        self.current_attempts_left = None
 
     def push_scene(self, scene):
         self.scenes.append(scene)
@@ -48,9 +52,10 @@ class Game:
     def quit(self):
         self.running = False
 
-    def complete_minigame(self, score: int):
+    def complete_minigame(self, score: int, success: bool):
         """Called by a minigame when it ends to submit a score and close itself."""
         self.last_minigame_score = score
+        self.last_minigame_success = success
         self.pop_scene()
 
     def run(self):

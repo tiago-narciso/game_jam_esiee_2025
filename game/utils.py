@@ -1,6 +1,6 @@
 import os
 import pygame
-from .config import WIDTH, HEIGHT, SND_DIR, NOT_CENTER_MSG, PRIMARY_COLOR
+from .config import WIDTH, HEIGHT, SND_DIR, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR
 
 
 def clamp(value, min_value, max_value):
@@ -47,3 +47,21 @@ def load_sound(name):
 def render_not_center_message(font) -> pygame.Surface:
     """Render the shared 'not center' message with the given font."""
     return font.render(NOT_CENTER_MSG, True, PRIMARY_COLOR)
+
+
+def draw_attempts(surface, game, pos=(None, 24)):
+    """Draw attempts HUD as small circles. pos: (x, y); x=None → right margin."""
+    if getattr(game, "max_attempts_per_game", None) is None:
+        return
+    max_att = int(game.max_attempts_per_game)
+    left = int(game.current_attempts_left) if game.current_attempts_left is not None else max_att
+    y = pos[1] if pos[1] is not None else 24
+    radius = 8
+    gap = 8
+    total_w = max_att * (radius * 2) + (max_att - 1) * gap
+    x0 = WIDTH - 20 - total_w if pos[0] is None else pos[0]
+    for i in range(max_att):
+        cx = x0 + i * (radius * 2 + gap) + radius
+        color = GOOD_COLOR if i < left else (90, 90, 90)
+        pygame.draw.circle(surface, color, (cx, y), radius)
+        pygame.draw.circle(surface, (30, 30, 30), (cx, y), radius, 2)

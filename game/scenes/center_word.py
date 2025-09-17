@@ -2,7 +2,7 @@ import math
 import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT
-from ..utils import blit_text_center, load_sound, render_not_center_message
+from ..utils import blit_text_center, load_sound, render_not_center_message, draw_attempts
 
 
 class CenterWordScene(Scene):
@@ -55,7 +55,7 @@ class CenterWordScene(Scene):
                 self.state = "stopped"
             elif self.state == "stopped":
                 # On click after finish, report score and leave
-                self.game.complete_minigame(getattr(self, "score", 0))
+                self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
 
     def update(self, dt):
         if self.state != "moving":
@@ -100,6 +100,7 @@ class CenterWordScene(Scene):
             else "R pour rejouer • M: Menu"
         )
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         # Draw the word, with a fill mask up to cursor_x
         # Base word in desaturated color
