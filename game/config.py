@@ -2,6 +2,15 @@ import os
 
 
 # ------------------ Global Config ------------------
+# 80s Computer Frame Configuration
+FRAME_BEZEL_THICKNESS = 24
+FRAME_CHIN_HEIGHT = 50
+
+# Game content area (inside the frame)
+GAME_WIDTH = 960 - (FRAME_BEZEL_THICKNESS * 2)
+GAME_HEIGHT = 540 - (FRAME_BEZEL_THICKNESS * 2) - FRAME_CHIN_HEIGHT
+
+# Total window size (including frame)
 WIDTH, HEIGHT = 960, 540
 FPS = 120
 TITLE = "Game Jam 2025 – Vous n'êtes pas au centre de l'histoire (Pygame)"
@@ -43,4 +52,3 @@ CELEBRITIES = [
 LIFE_KEY_SPEED = 220  # pixels per second left/right
 LIFE_TIMELINE_PADDING_YEARS = 20  # extra years before birth and after death
 LIFE_TARGET_KIND = "random"  # "random" or "midpoint" (for fallback/testing)
-

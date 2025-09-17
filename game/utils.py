@@ -1,6 +1,6 @@
 import os
 import pygame
-from .config import WIDTH, HEIGHT, SND_DIR, FONT_PATH, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR
+from .config import WIDTH, HEIGHT, SND_DIR, FONT_PATH, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR, FRAME_BEZEL_THICKNESS, FRAME_CHIN_HEIGHT, GAME_WIDTH, GAME_HEIGHT
 
 
 def clamp(value, min_value, max_value):
@@ -8,7 +8,7 @@ def clamp(value, min_value, max_value):
 
 
 def blit_text_center(surface, text_surface, y):
-    rect = text_surface.get_rect(center=(WIDTH // 2, y))
+    rect = text_surface.get_rect(center=(GAME_WIDTH // 2, y))
     surface.blit(text_surface, rect)
 
 
@@ -49,6 +49,11 @@ def render_not_center_message(font) -> pygame.Surface:
     return font.render(NOT_CENTER_MSG, True, PRIMARY_COLOR)
 
 
+def get_game_area_rect() -> pygame.Rect:
+    """Get the rectangle where game content should be drawn (inside the frame)."""
+    return pygame.Rect(FRAME_BEZEL_THICKNESS, FRAME_BEZEL_THICKNESS, GAME_WIDTH, GAME_HEIGHT)
+
+
 def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     """Draw an 80s computer monitor frame around the game surface.
     
@@ -60,83 +65,77 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     """
     width, height = surface.get_size()
     
-    # Create overlay surface for the frame
-    frame = pygame.Surface((width, height), pygame.SRCALPHA)
-    
     # Gray plastic colors
-    dark_gray = (60, 60, 65, 255)      # Main bezel
-    medium_gray = (80, 80, 85, 255)    # Inner accent
-    light_gray = (100, 100, 105, 255)  # Highlight
-    very_dark = (40, 40, 45, 255)      # Shadow
+    dark_gray = (60, 60, 65)      # Main bezel
+    medium_gray = (80, 80, 85)    # Inner accent
+    light_gray = (100, 100, 105)  # Highlight
     
     # Main bezel frame (outer border)
-    bezel_thickness = 24
     outer_rect = pygame.Rect(0, 0, width, height)
-    inner_rect = outer_rect.inflate(-bezel_thickness * 2, -bezel_thickness * 2)
+    inner_rect = outer_rect.inflate(-FRAME_BEZEL_THICKNESS * 2, -FRAME_BEZEL_THICKNESS * 2)
     
-    # Draw main bezel (only border, not filled)
-    pygame.draw.rect(frame, dark_gray, outer_rect, width=bezel_thickness, border_radius=0)
+    # Fill the entire surface with dark gray (bezel color)
+    surface.fill(dark_gray)
+    
+    # Clear the center area for the game (make it black)
+    pygame.draw.rect(surface, (0, 0, 0), inner_rect)
     
     # Inner accent line
-    pygame.draw.rect(frame, medium_gray, inner_rect, width=6, border_radius=0)
+    pygame.draw.rect(surface, medium_gray, inner_rect, width=6, border_radius=0)
     
     # Highlight on top edge for 3D effect
-    highlight_rect = pygame.Rect(bezel_thickness, bezel_thickness, 
-                                width - bezel_thickness * 2, 8)
-    pygame.draw.rect(frame, light_gray, highlight_rect, border_radius=4)
+    highlight_rect = pygame.Rect(FRAME_BEZEL_THICKNESS, FRAME_BEZEL_THICKNESS, 
+                                width - FRAME_BEZEL_THICKNESS * 2, 8)
+    pygame.draw.rect(surface, light_gray, highlight_rect, border_radius=4)
     
     # Bottom chin section (thicker area)
-    chin_height = 50
-    chin_rect = pygame.Rect(bezel_thickness, height - chin_height - bezel_thickness,
-                           width - bezel_thickness * 2, chin_height)
+    chin_rect = pygame.Rect(FRAME_BEZEL_THICKNESS, height - FRAME_CHIN_HEIGHT - FRAME_BEZEL_THICKNESS,
+                           width - FRAME_BEZEL_THICKNESS * 2, FRAME_CHIN_HEIGHT)
     
     # Chin panel
-    pygame.draw.rect(frame, dark_gray, chin_rect, border_radius=0)
-    pygame.draw.rect(frame, medium_gray, chin_rect.inflate(-8, -8), width=3, border_radius=8)
+    pygame.draw.rect(surface, dark_gray, chin_rect, border_radius=0)
+    pygame.draw.rect(surface, medium_gray, chin_rect.inflate(-8, -8), width=3, border_radius=8)
     
     # Power LED (green dot on left side)
     led_x = chin_rect.left + 30
     led_y = chin_rect.centery
-    pygame.draw.circle(frame, (0, 255, 0, 200), (led_x, led_y), 4)
-    pygame.draw.circle(frame, (255, 255, 255, 100), (led_x, led_y), 2)
+    pygame.draw.circle(surface, (0, 255, 0), (led_x, led_y), 4)
+    pygame.draw.circle(surface, (255, 255, 255), (led_x, led_y), 2)
     
     # Power LED label
     font = pygame.font.Font(FONT_PATH, 16)
-    led_text = font.render("PWR", True, (200, 200, 200, 180))
-    frame.blit(led_text, (led_x - 15, led_y + 8))
+    led_text = font.render("PWR", True, (200, 200, 200))
+    surface.blit(led_text, (led_x - 15, led_y + 8))
     
     # Speaker grille (right side)
     grille_x = chin_rect.right - 80
     grille_y = chin_rect.centery - 10
     for i in range(8):
         x = grille_x + i * 8
-        pygame.draw.rect(frame, (70, 70, 75, 150), 
+        pygame.draw.rect(surface, (70, 70, 75), 
                         pygame.Rect(x, grille_y, 4, 20), border_radius=2)
     
     # Brand/model text area (center)
     brand_rect = pygame.Rect(0, 0, 120, 20)
     brand_rect.center = (chin_rect.centerx, chin_rect.centery)
-    pygame.draw.rect(frame, (50, 50, 55, 180), brand_rect, border_radius=4)
+    pygame.draw.rect(surface, (50, 50, 55), brand_rect, border_radius=4)
     
     # Model text
     model_font = pygame.font.Font(FONT_PATH, 14)
-    model_text = model_font.render("AU MILIEU", True, (180, 180, 180, 200))
+    model_text = model_font.render("AU MILIEU", True, (180, 180, 180))
     text_rect = model_text.get_rect(center=brand_rect.center)
-    frame.blit(model_text, text_rect)
+    surface.blit(model_text, text_rect)
     
     # Corner screws (decorative)
-    screw_color = (120, 120, 125, 200)
+    screw_color = (120, 120, 125)
     screw_positions = [
-        (bezel_thickness + 10, height - bezel_thickness - 10),
-        (width - bezel_thickness - 10, height - bezel_thickness - 10)
+        (FRAME_BEZEL_THICKNESS + 10, height - FRAME_BEZEL_THICKNESS - 10),
+        (width - FRAME_BEZEL_THICKNESS - 10, height - FRAME_BEZEL_THICKNESS - 10)
     ]
     
     for pos in screw_positions:
-        pygame.draw.circle(frame, screw_color, pos, 3)
-        pygame.draw.circle(frame, (160, 160, 165, 150), pos, 1)
-    
-    # Apply the frame to the surface
-    surface.blit(frame, (0, 0))
+        pygame.draw.circle(surface, screw_color, pos, 3)
+        pygame.draw.circle(surface, (160, 160, 165), pos, 1)
 
 
 def draw_attempts(surface, game, pos=(None, 24)):
@@ -149,7 +148,7 @@ def draw_attempts(surface, game, pos=(None, 24)):
     radius = 8
     gap = 8
     total_w = max_att * (radius * 2) + (max_att - 1) * gap
-    x0 = WIDTH - 20 - total_w if pos[0] is None else pos[0]
+    x0 = GAME_WIDTH - 20 - total_w if pos[0] is None else pos[0]
     for i in range(max_att):
         cx = x0 + i * (radius * 2 + gap) + radius
         color = GOOD_COLOR if i < left else (90, 90, 90)

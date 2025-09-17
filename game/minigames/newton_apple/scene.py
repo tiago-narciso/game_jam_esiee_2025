@@ -1,6 +1,6 @@
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, FONT_PATH
+from ...config import GAME_WIDTH, GAME_HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, FONT_PATH
 from ...utils import blit_text_center, load_sound, render_not_center_message, load_image, draw_attempts
 
 
@@ -16,10 +16,10 @@ class NewtonAppleScene(Scene):
         self.tree_foliage_color = (34, 139, 34)
         self.newton_color = (70, 130, 180)
         self.apple_color = (255, 0, 0)
-        self.ground_y = HEIGHT - 50
+        self.ground_y = GAME_HEIGHT - 50
         
         self.tree_img = load_image("assets/images/tree.png", max_w=400, max_h=500)
-        self.tree_rect = self.tree_img.get_rect(midbottom=(WIDTH // 2, self.ground_y))
+        self.tree_rect = self.tree_img.get_rect(midbottom=(GAME_WIDTH // 2, self.ground_y))
 
         self.newton_img = load_image("assets/images/newton.png", max_w=100, max_h=100)
         self.newton_rect = self.newton_img.get_rect(midbottom=(self.tree_rect.centerx + 30, self.ground_y))
@@ -94,7 +94,7 @@ class NewtonAppleScene(Scene):
         draw_attempts(screen, self.game, pos=(None, 26))
         
         # Draw ground behind other objects
-        pygame.draw.rect(screen, self.tree_foliage_color, (0, self.ground_y, WIDTH, HEIGHT - self.ground_y))
+        pygame.draw.rect(screen, self.tree_foliage_color, (0, self.ground_y, GAME_WIDTH, GAME_HEIGHT - self.ground_y))
 
         screen.blit(self.tree_img, self.tree_rect)
         screen.blit(self.newton_img, self.newton_rect)
@@ -104,9 +104,9 @@ class NewtonAppleScene(Scene):
         screen.blit(self.apple_img, self.apple_rect)
         
         diff = abs(self.apple_y - self.target_y)
-        blit_text_center(screen, self.ui_font.render(f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR), HEIGHT - 28)
+        blit_text_center(screen, self.ui_font.render(f"Décalage: {int(diff)} px (Tolérance: {self.TOLERANCE}px)", True, PRIMARY_COLOR), GAME_HEIGHT - 28)
         if self.state == "stopped":
-            overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+            overlay = pygame.Surface((GAME_WIDTH, GAME_HEIGHT), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
@@ -115,6 +115,6 @@ class NewtonAppleScene(Scene):
             else:
                 t1 = render_not_center_message(self.title_font)
                 t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR)
-            blit_text_center(screen, t1, HEIGHT // 2 - 10)
-            blit_text_center(screen, t2, HEIGHT // 2 + 26)
-            blit_text_center(screen, self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, PRIMARY_COLOR), HEIGHT // 2 + 50)
+            blit_text_center(screen, t1, GAME_HEIGHT // 2 - 10)
+            blit_text_center(screen, t2, GAME_HEIGHT // 2 + 26)
+            blit_text_center(screen, self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, PRIMARY_COLOR), GAME_HEIGHT // 2 + 50)

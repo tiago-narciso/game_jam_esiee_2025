@@ -1,7 +1,7 @@
 import sys
 import pygame
-from .config import WIDTH, HEIGHT, FPS, TITLE
-from .utils import draw_80s_computer_frame
+from .config import WIDTH, HEIGHT, FPS, TITLE, GAME_WIDTH, GAME_HEIGHT
+from .utils import draw_80s_computer_frame, get_game_area_rect
 
 
 class Scene:
@@ -23,7 +23,7 @@ class Game:
         pygame.init()
         pygame.display.set_caption(TITLE)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
-        self.game_surface = pygame.Surface((WIDTH, HEIGHT))
+        self.game_surface = pygame.Surface((GAME_WIDTH, GAME_HEIGHT))
         self.clock = pygame.time.Clock()
 
         try:
@@ -74,12 +74,19 @@ class Game:
             scene = self.top_scene()
             if scene:
                 scene.update(dt)
+                # Draw game content to the game surface (smaller area)
                 scene.draw(self.game_surface)
-                # Apply 80s computer frame overlay
-                draw_80s_computer_frame(self.game_surface)
             
-            # Scale the game surface to the screen size and blit it
-            self.screen.blit(pygame.transform.scale(self.game_surface, self.screen.get_rect().size), (0, 0))
+            # Create the full frame surface
+            frame_surface = pygame.Surface((WIDTH, HEIGHT))
+            draw_80s_computer_frame(frame_surface)
+            
+            # Blit the game content into the frame
+            game_area = get_game_area_rect()
+            frame_surface.blit(self.game_surface, (game_area.x, game_area.y))
+            
+            # Scale the frame surface to the screen size and blit it
+            self.screen.blit(pygame.transform.scale(frame_surface, self.screen.get_rect().size), (0, 0))
             pygame.display.flip()
         pygame.quit()
         sys.exit(0)
