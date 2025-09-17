@@ -7,8 +7,8 @@ from ...utils import blit_text_center, load_sound, render_not_center_message, dr
 
 class CenterWordScene(Scene):
     WORD = "HISTOIRE"
-    TOLERANCE = 8
-    BASE_SPEED = 320
+    TOLERANCE = 2
+    BASE_SPEED = 400
     PADDING = 40
 
     def __init__(self, game):
