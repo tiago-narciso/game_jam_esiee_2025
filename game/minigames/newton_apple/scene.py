@@ -50,6 +50,14 @@ class NewtonAppleScene(Scene):
             elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "falling":
                     self.validate(); self.state = "stopped"
+                elif self.state == "stopped":
+                    score = getattr(self, "score", 0)
+                    success = (self.result == "win")
+                    self.game.complete_minigame(score, success)
+            elif self.state == "stopped":
+                score = getattr(self, "score", 0)
+                success = (self.result == "win")
+                self.game.complete_minigame(score, success)
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "falling":
                 self.validate(); self.state = "stopped"
@@ -81,7 +89,7 @@ class NewtonAppleScene(Scene):
     def draw(self, screen):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
-        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "R pour rejouer • clic pour continuer"
+        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "ESPACE/clic pour continuer • R pour rejouer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
         draw_attempts(screen, self.game, pos=(None, 26))
         

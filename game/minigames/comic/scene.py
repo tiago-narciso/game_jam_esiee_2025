@@ -62,9 +62,17 @@ class ComicScene(Scene):
             elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "moving":
                     self.validate()
+                elif self.state == "stopped":
+                    score = getattr(self, "score", 0)
+                    success = (self.result == "win")
+                    self.game.complete_minigame(score, success)
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "moving":
                 self.validate()
+            elif self.state == "stopped":
+                score = getattr(self, "score", 0)
+                success = (self.result == "win")
+                self.game.complete_minigame(score, success)
 
     def reset(self):
         self.state = "moving"
@@ -98,11 +106,14 @@ class ComicScene(Scene):
         else:
             if self.snd_fail:
                 self.snd_fail.play()
+        # Score: 100 if correct middle, else 0
+        self.score = 100 if is_middle else 0
 
     def draw(self, screen):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Quel est le milieu de l'histoire ?", True, PRIMARY_COLOR), 50)
-        blit_text_center(screen, self.ui_font.render("M: Menu  •  R: Rejouer", True, SECONDARY_COLOR), 80)
+        hint_top = "M: Menu  •  R: Rejouer" if self.state != "moving" else "M: Menu"
+        blit_text_center(screen, self.ui_font.render(hint_top, True, SECONDARY_COLOR), 80)
 
         # Grid geometry
         margin_x, margin_y = 60, 120
@@ -139,13 +150,16 @@ class ComicScene(Scene):
             screen.blit(overlay, (0, 0))
             if self.result == "win":
                 t1 = self.title_font.render("Bravo ! Tu es bien au milieu de l'histoire", True, GOOD_COLOR)
-                t2 = self.ui_font.render("R pour rejouer • M pour menu", True, PRIMARY_COLOR)
+                t2 = self.ui_font.render("ESPACE/clic pour continuer • R pour rejouer • M pour menu", True, PRIMARY_COLOR)
             else:
                 t1 = self.title_font.render("Vous n'êtes pas au milieu de l'histoire !!", True, BAD_COLOR)
                 ans = os.path.basename(self.story_middle_path) if self.story_middle_path else "N/A"
-                t2 = self.ui_font.render(f"La case du milieu était : {ans}  •  R pour rejouer • M pour menu", True, PRIMARY_COLOR)
+                t2 = self.ui_font.render(f"La case du milieu était : {ans}  •  ESPACE/clic pour continuer • R pour rejouer • M pour menu", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, HEIGHT // 2 - 10)
             blit_text_center(screen, t2, HEIGHT // 2 + 26)
+            # Score display for consistency
+            score_text = self.ui_font.render(f"Score: {getattr(self, 'score', 0)}", True, PRIMARY_COLOR)
+            blit_text_center(screen, score_text, HEIGHT // 2 + 52)
 
 
 

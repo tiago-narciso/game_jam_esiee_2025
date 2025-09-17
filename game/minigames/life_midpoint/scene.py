@@ -60,9 +60,8 @@ class LifeMidpointScene(Scene):
                     self.holding_right = True
                 elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                     self.validate_selection()
-        elif e.type == pygame.MOUSEBUTTONDOWN and self.state == "result":
-            # Click to continue from results
-            self.game.complete_minigame(getattr(self, "score", 0), self._is_success())
+            elif self.state == "result" and e.key in (pygame.K_SPACE, pygame.K_RETURN):
+                self.game.complete_minigame(getattr(self, "score", 0), self._is_success())
         elif e.type == pygame.KEYUP and self.state == "aim":
             if e.key in (pygame.K_LEFT, pygame.K_a):
                 self.holding_left = False
@@ -123,7 +122,7 @@ class LifeMidpointScene(Scene):
         pygame.draw.circle(screen, cursor_color, (int(self.cursor_x), self.timeline_rect.centery), 8)
 
         # Instructions
-        hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "Clique ou ESPACE pour continuer"
+        hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "ESPACE pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), HEIGHT - 26)
         draw_attempts(screen, self.game, pos=(None, 26))
 
