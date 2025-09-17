@@ -3,6 +3,7 @@ from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
 from ..utils import blit_text_center
 from ..leaderboard import load_entries, LeaderboardEntry
+from .username import UsernameScene
 
 
 class LeaderboardScene(Scene):
@@ -18,8 +19,17 @@ class LeaderboardScene(Scene):
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
             if e.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
-                # back to menu
+                # Pop leaderboard and session scenes
                 self.game.pop_scene()
+                self.game.pop_scene()
+                
+                # Create a new username scene
+                def on_submit(name: str):
+                    self.game.pop_scene()
+                    from .session import SessionScene
+                    self.game.push_scene(SessionScene(self.game, num_games=5, username=name))
+                
+                self.game.push_scene(UsernameScene(self.game, on_submit))
 
     def draw(self, screen):
         screen.fill(BG_COLOR)
@@ -51,5 +61,3 @@ class LeaderboardScene(Scene):
         #     self.hint_font.render("Entrée/Espace/Échap pour revenir au menu", True, SECONDARY_COLOR),
         #     HEIGHT - 40,
         # )
-
-

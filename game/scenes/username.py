@@ -1,7 +1,7 @@
 import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
-from ..utils import blit_text_center
+from ..utils import blit_text_center, load_image
 
 
 class UsernameScene(Scene):
@@ -15,11 +15,29 @@ class UsernameScene(Scene):
         self.max_len = 16
         self.allowed_extra = set("-_ ")
 
+        self.trophy_img = load_image("assets/images/trophé.png", max_w=40, max_h=40)
+        self.trophy_rect = self.trophy_img.get_rect(topright=(900, 20))
+
+        self.close_img = load_image("assets/images/croix.png", max_w=40, max_h=40)
+        self.close_rect = self.close_img.get_rect(topleft=(20, 20))
+
     def handle_event(self, e):
-        if e.type == pygame.KEYDOWN:
+        if e.type == pygame.MOUSEBUTTONDOWN:
+            # Scale mouse coordinates to match the game surface resolution
+            screen_rect = self.game.screen.get_rect()
+            game_surface_rect = self.game.game_surface.get_rect()
+            scaled_pos = (
+                e.pos[0] * game_surface_rect.width // screen_rect.width,
+                e.pos[1] * game_surface_rect.height // screen_rect.height,
+            )
+            if self.trophy_rect.collidepoint(scaled_pos):
+                from .leaderboard import LeaderboardScene
+                self.game.push_scene(LeaderboardScene(self.game))
+            elif self.close_rect.collidepoint(scaled_pos):
+                self.game.quit()
+        elif e.type == pygame.KEYDOWN:
             if e.key == pygame.K_ESCAPE:
-                # back to previous scene (menu)
-                self.game.pop_scene()
+                self.game.quit()
             elif e.key == pygame.K_RETURN:
                 name = self.username.strip()
                 if name:
@@ -46,4 +64,5 @@ class UsernameScene(Scene):
         text = self.input_font.render(display, True, ACCENT_COLOR if self.username else SECONDARY_COLOR)
         blit_text_center(screen, text, 220)
 
-
+        screen.blit(self.trophy_img, self.trophy_rect)
+        screen.blit(self.close_img, self.close_rect)

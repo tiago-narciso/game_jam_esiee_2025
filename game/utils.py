@@ -138,6 +138,14 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
         pygame.draw.circle(surface, (160, 160, 165), pos, 1)
 
 
+def create_scanlines(width, height, line_height=2, alpha=30):
+    """Create a surface with a scanline effect."""
+    scanline_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+    for y in range(0, height, line_height * 2):
+        pygame.draw.rect(scanline_surface, (0, 0, 0, alpha), (0, y, width, line_height))
+    return scanline_surface
+
+
 def draw_attempts(surface, game, pos=(None, 24)):
     """Draw attempts HUD as small circles. pos: (x, y); x=None → right margin."""
     if getattr(game, "max_attempts_per_game", None) is None:

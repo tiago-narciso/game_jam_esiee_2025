@@ -1,6 +1,5 @@
 import random
 from .core import Game
-from .scenes.menu import MenuScene
 from .scenes.username import UsernameScene
 from .scenes.leaderboard import LeaderboardScene
 from .scenes.session import SessionScene
@@ -9,31 +8,21 @@ from .minigames.comic.scene import ComicScene
 from .minigames import get_all_minigames
 
 
-def create_game_with_menu():
+def create_game():
     game = Game()
-    menu = MenuScene(game)
 
-    def start_session():
-        def on_submit(name: str):
-            # pop username scene
-            game.pop_scene()
-            game.push_scene(SessionScene(game, num_games=5, username=name))
-        game.push_scene(UsernameScene(game, on_submit))
+    def on_submit(name: str):
+        # pop username scene
+        game.pop_scene()
+        game.push_scene(SessionScene(game, num_games=5, username=name))
 
-    menu.set_menu_items(
-        [
-            ("Jouer", start_session),
-            ("Test BD", lambda: game.push_scene(ComicScene(game))),
-            ("Leaderboard (à venir)", lambda: None),
-            ("Quitter", lambda: game.quit()),
-        ]
-    )
-    game.push_scene(menu)
+    username_scene = UsernameScene(game, on_submit)
+    game.push_scene(username_scene)
     return game
 
 
 def main():
-    game = create_game_with_menu()
+    game = create_game()
     game.run()
 
 
