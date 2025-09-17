@@ -1,7 +1,7 @@
 import random
 import pygame
 from ..core import Scene
-from ..config import WHITE, GRAY, DARK, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT
 from ..minigames import get_all_minigames
 from ..utils import blit_text_center
 
@@ -51,12 +51,9 @@ class SessionScene(Scene):
 
     def draw(self, screen):
         # Simple waiting/transition screen between minigames
-        screen.fill(DARK)
-        title = self.title_font.render("Session de mini-jeux", True, WHITE)
+        screen.fill(BG_COLOR)
+        title = self.title_font.render("Session de mini-jeux", True, PRIMARY_COLOR)
         blit_text_center(screen, title, 80)
         status = f"Jeu {min(self.index + (0 if self.active else 1), self.num_games)} / {self.num_games} — Score total: {sum(self.scores) if self.scores else 0}"
-        blit_text_center(screen, self.ui_font.render(status, True, WHITE), 130)
-        blit_text_center(screen, self.ui_font.render("Échap/M pour quitter la session", True, GRAY), HEIGHT - 30)
-
-
-
+        blit_text_center(screen, self.ui_font.render(status, True, PRIMARY_COLOR), 130)
+        blit_text_center(screen, self.ui_font.render("Échap/M pour quitter la session", True, SECONDARY_COLOR), HEIGHT - 30)

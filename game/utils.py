@@ -1,6 +1,6 @@
 import os
 import pygame
-from .config import WIDTH, HEIGHT, SND_DIR, NOT_CENTER_MSG, WHITE
+from .config import WIDTH, HEIGHT, SND_DIR, NOT_CENTER_MSG, PRIMARY_COLOR
 
 
 def clamp(value, min_value, max_value):
@@ -46,7 +46,4 @@ def load_sound(name):
 
 def render_not_center_message(font) -> pygame.Surface:
     """Render the shared 'not center' message with the given font."""
-    return font.render(NOT_CENTER_MSG, True, WHITE)
-
-
-
+    return font.render(NOT_CENTER_MSG, True, PRIMARY_COLOR)
