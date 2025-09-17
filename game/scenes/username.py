@@ -39,7 +39,7 @@ class UsernameScene(Scene):
     def draw(self, screen):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Entrer un pseudo", True, PRIMARY_COLOR), 120)
-        hint = "Lettres/chiffres/-,_ (max 16). Entrée pour valider, Échap pour annuler"
+        hint = "Entrée pour valider, Échap pour annuler"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 160)
 
         display = self.username if self.username else "—"
