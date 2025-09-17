@@ -120,7 +120,7 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     
     # Model text
     model_font = pygame.font.Font(FONT_PATH, 14)
-    model_text = model_font.render("GAME JAM 2025", True, (180, 180, 180, 200))
+    model_text = model_font.render("AU MILIEU", True, (180, 180, 180, 200))
     text_rect = model_text.get_rect(center=brand_rect.center)
     frame.blit(model_text, text_rect)
     

@@ -40,12 +40,12 @@ class MenuScene(Scene):
         for i, (label, _) in enumerate(self.items):
             col = ACCENT_COLOR if i == self.idx else PRIMARY_COLOR
             blit_text_center(screen, self.item_font.render(label, True, col), 220 + i * 44)
-        blit_text_center(
-            screen,
-            self.hint_font.render(
-                "↑/↓ pour naviguer • Entrée pour valider • Échap pour quitter",
-                True,
-                SECONDARY_COLOR,
-            ),
-            HEIGHT - 40,
-        )
+        # blit_text_center(
+        #     screen,
+        #     self.hint_font.render(
+        #         "↑/↓ pour naviguer • Entrée pour valider • Échap pour quitter",
+        #         True,
+        #         SECONDARY_COLOR,
+        #     ),
+        #     HEIGHT - 40,
+        # )

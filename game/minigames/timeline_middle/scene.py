@@ -9,7 +9,7 @@ from .data import IPHONE_MODELS
 
 
 class TimelineMiddleScene(Scene):
-    SCROLL_SPEED = 300
+    SCROLL_SPEED = 400
     CARD_W = 320
     CARD_H = 220
     GAP = 28
