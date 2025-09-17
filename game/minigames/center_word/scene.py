@@ -1,7 +1,7 @@
 import math
 import pygame
 from ...core import Scene
-from ...config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT
+from ...config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT, FONT_PATH
 from ...utils import blit_text_center, load_sound, render_not_center_message, draw_attempts
 
 
@@ -13,9 +13,9 @@ class CenterWordScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.word_font = pygame.font.SysFont(None, 160, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.word_font = pygame.font.Font(FONT_PATH, 160)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
 
         self.word_surf = self.word_font.render(self.WORD, True, PRIMARY_COLOR)
         self.word_rect = self.word_surf.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 20))

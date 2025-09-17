@@ -1,6 +1,6 @@
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR
+from ...config import WIDTH, HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, FONT_PATH
 from ...utils import blit_text_center, load_sound, render_not_center_message, load_image, draw_attempts
 
 
@@ -10,8 +10,8 @@ class NewtonAppleScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
         self.tree_trunk_color = (139, 69, 19)
         self.tree_foliage_color = (34, 139, 34)
         self.newton_color = (70, 130, 180)

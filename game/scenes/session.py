@@ -1,7 +1,7 @@
 import random
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT, FONT_PATH
 from ..minigames import get_all_minigames
 from ..utils import blit_text_center
 from ..leaderboard import add_score
@@ -11,8 +11,8 @@ from .leaderboard import LeaderboardScene
 class SessionScene(Scene):
     def __init__(self, game, num_games: int | None = 5, username: str | None = None):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
         self.username = username
         # Build queue of distinct minigames based on requested count
         choices = get_all_minigames()

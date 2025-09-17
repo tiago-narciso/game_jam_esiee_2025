@@ -1,6 +1,6 @@
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
 from ..utils import blit_text_center
 from ..leaderboard import load_entries, LeaderboardEntry
 
@@ -8,9 +8,9 @@ from ..leaderboard import load_entries, LeaderboardEntry
 class LeaderboardScene(Scene):
     def __init__(self, game, highlight_username: str | None = None, highlight_score: int | None = None):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.row_font = pygame.font.SysFont(None, 24)
-        self.hint_font = pygame.font.SysFont(None, 20)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.row_font = pygame.font.Font(FONT_PATH, 24)
+        self.hint_font = pygame.font.Font(FONT_PATH, 20)
         self.entries = load_entries()
         self.highlight_username = highlight_username
         self.highlight_score = highlight_score

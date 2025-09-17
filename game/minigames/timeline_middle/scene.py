@@ -3,7 +3,7 @@ import os
 import random
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, IMG_DIR
+from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, IMG_DIR, FONT_PATH
 from ...utils import blit_text_center, load_image, load_sound, render_not_center_message, draw_attempts
 from .data import IPHONE_MODELS
 
@@ -16,10 +16,10 @@ class TimelineMiddleScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 38, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
-        self.card_title_font = pygame.font.SysFont(None, 26, bold=True)
-        self.card_desc_font = pygame.font.SysFont(None, 24, bold=True)
+        self.title_font = pygame.font.Font(FONT_PATH, 38)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
+        self.card_title_font = pygame.font.Font(FONT_PATH, 26)
+        self.card_desc_font = pygame.font.Font(FONT_PATH, 24)
 
         self.cards = self._build_cards(IPHONE_MODELS)
         self.scroll_x = 0.0

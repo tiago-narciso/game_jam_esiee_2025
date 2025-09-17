@@ -1,7 +1,7 @@
 import random
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND
+from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND, FONT_PATH
 from ...utils import blit_text_center, clamp, draw_attempts
 
 
@@ -10,9 +10,9 @@ class LifeMidpointScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 36, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
-        self.large_font = pygame.font.SysFont(None, 28)
+        self.title_font = pygame.font.Font(FONT_PATH, 36)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
+        self.large_font = pygame.font.Font(FONT_PATH, 28)
         self.person = random.choice(CELEBRITIES)
         name, birth, death = self.person
         self.name = name

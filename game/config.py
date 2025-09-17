@@ -19,6 +19,8 @@ BAD_COLOR = (255, 107, 107)      # Échec (identique à accent)
 ASSETS_DIR = os.path.join("assets")
 IMG_DIR = os.path.join(ASSETS_DIR, "images")
 SND_DIR = os.path.join(ASSETS_DIR, "sounds")
+FONT_DIR = os.path.join(ASSETS_DIR, "fonts")
+FONT_PATH = os.path.join(FONT_DIR, "VCR_OSD_MONO.ttf")
 
 # Shared messages
 NOT_CENTER_MSG = "Vous n'êtes pas au centre du jeu."

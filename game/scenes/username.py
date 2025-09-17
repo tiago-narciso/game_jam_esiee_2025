@@ -1,6 +1,6 @@
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
 from ..utils import blit_text_center
 
 
@@ -8,9 +8,9 @@ class UsernameScene(Scene):
     def __init__(self, game, on_submit):
         super().__init__(game)
         self.on_submit = on_submit
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 24)
-        self.input_font = pygame.font.SysFont(None, 32)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.ui_font = pygame.font.Font(FONT_PATH, 24)
+        self.input_font = pygame.font.Font(FONT_PATH, 32)
         self.username = ""
         self.max_len = 16
         self.allowed_extra = set("-_ ")

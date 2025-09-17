@@ -1,14 +1,14 @@
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT, FONT_PATH
 from ..utils import blit_text_center
 
 
 class EndScene(Scene):
     def __init__(self, game, total_score: int, games_count: int):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 48, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 26)
+        self.title_font = pygame.font.Font(FONT_PATH, 48)
+        self.ui_font = pygame.font.Font(FONT_PATH, 26)
         self.total_score = total_score
         self.games_count = games_count
 

@@ -2,7 +2,7 @@ import os
 import random
 import pygame
 from ...core import Scene
-from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, IMG_DIR
+from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, IMG_DIR, FONT_PATH
 from ...utils import blit_text_center, load_image, load_sound
 
 
@@ -13,8 +13,8 @@ class ComicScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.SysFont(None, 40, bold=True)
-        self.ui_font = pygame.font.SysFont(None, 22)
+        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.ui_font = pygame.font.Font(FONT_PATH, 22)
 
         # Load images from assets/images/comic
         self.comic_dir = os.path.join(IMG_DIR, "comic")

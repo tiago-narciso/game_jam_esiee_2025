@@ -1,6 +1,6 @@
 import os
 import pygame
-from .config import WIDTH, HEIGHT, SND_DIR, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR
+from .config import WIDTH, HEIGHT, SND_DIR, FONT_PATH, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR
 
 
 def clamp(value, min_value, max_value):
@@ -28,7 +28,7 @@ def load_image(path, max_w=720, max_h=400):
         surf = pygame.Surface((max_w, int(max_h * 0.75)), pygame.SRCALPHA)
         surf.fill((40, 44, 52))
         pygame.draw.rect(surf, (70, 80, 90), surf.get_rect(), 3, border_radius=12)
-        font = pygame.font.SysFont(None, 28, bold=True)
+        font = pygame.font.Font(FONT_PATH, 28)
         txt = font.render("Image manquante", True, (200, 200, 200))
         surf.blit(txt, txt.get_rect(center=surf.get_rect().center))
         return surf
@@ -101,7 +101,7 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     pygame.draw.circle(frame, (255, 255, 255, 100), (led_x, led_y), 2)
     
     # Power LED label
-    font = pygame.font.SysFont(None, 16)
+    font = pygame.font.Font(FONT_PATH, 16)
     led_text = font.render("PWR", True, (200, 200, 200, 180))
     frame.blit(led_text, (led_x - 15, led_y + 8))
     
@@ -119,7 +119,7 @@ def draw_80s_computer_frame(surface: pygame.Surface) -> None:
     pygame.draw.rect(frame, (50, 50, 55, 180), brand_rect, border_radius=4)
     
     # Model text
-    model_font = pygame.font.SysFont(None, 14, bold=True)
+    model_font = pygame.font.Font(FONT_PATH, 14)
     model_text = model_font.render("GAME JAM 2025", True, (180, 180, 180, 200))
     text_rect = model_text.get_rect(center=brand_rect.center)
     frame.blit(model_text, text_rect)

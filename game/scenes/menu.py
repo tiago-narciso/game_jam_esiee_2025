@@ -1,6 +1,6 @@
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
 from ..utils import blit_text_center, load_sound
 
 
@@ -9,9 +9,9 @@ class MenuScene(Scene):
         super().__init__(game)
         self.items = []  # placeholders, real callbacks wired in main factory
         self.idx = 0
-        self.title_font = pygame.font.SysFont(None, 48, bold=True)
-        self.item_font = pygame.font.SysFont(None, 32)
-        self.hint_font = pygame.font.SysFont(None, 20)
+        self.title_font = pygame.font.Font(FONT_PATH, 48)
+        self.item_font = pygame.font.Font(FONT_PATH, 32)
+        self.hint_font = pygame.font.Font(FONT_PATH, 20)
 
         self.snd_move = load_sound("click.wav")
 
