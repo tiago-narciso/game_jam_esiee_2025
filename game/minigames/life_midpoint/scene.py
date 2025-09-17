@@ -2,7 +2,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND
-from ...utils import blit_text_center, clamp
+from ...utils import blit_text_center, clamp, draw_attempts
 
 
 class LifeMidpointScene(Scene):
@@ -60,6 +60,8 @@ class LifeMidpointScene(Scene):
                     self.holding_right = True
                 elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                     self.validate_selection()
+            elif self.state == "result" and e.key in (pygame.K_SPACE, pygame.K_RETURN):
+                self.game.complete_minigame(getattr(self, "score", 0), self._is_success())
         elif e.type == pygame.KEYUP and self.state == "aim":
             if e.key in (pygame.K_LEFT, pygame.K_a):
                 self.holding_left = False
@@ -88,6 +90,12 @@ class LifeMidpointScene(Scene):
         self.score = int(100 * precision)
         self.state = "result"
 
+    def _is_success(self):
+        # Consider success when error within 2 years
+        if self.selected_year is None:
+            return False
+        return abs(self.selected_year - self.target_year) <= 2
+
     def draw(self, screen):
         screen.fill(BG_COLOR)
         subtitle = f"Trouve l'année cible de {self.name}"
@@ -114,8 +122,9 @@ class LifeMidpointScene(Scene):
         pygame.draw.circle(screen, cursor_color, (int(self.cursor_x), self.timeline_rect.centery), 8)
 
         # Instructions
-        hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "Appuyez sur ESPACE pour continuer"
+        hint = "←/→ pour viser • ESPACE pour valider • M: menu" if self.state == "aim" else "ESPACE pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), HEIGHT - 26)
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         if self.state == "result":
             chosen = self.large_font.render(f"Votre année: {self.selected_year}", True, PRIMARY_COLOR)

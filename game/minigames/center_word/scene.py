@@ -2,7 +2,7 @@ import math
 import pygame
 from ...core import Scene
 from ...config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT
-from ...utils import blit_text_center, load_sound, render_not_center_message
+from ...utils import blit_text_center, load_sound, render_not_center_message, draw_attempts
 
 
 class CenterWordScene(Scene):
@@ -49,13 +49,17 @@ class CenterWordScene(Scene):
                 if self.state == "moving":
                     self.validate()
                     self.state = "stopped"
+                elif self.state == "stopped":
+                    score = getattr(self, "score", 0)
+                    success = (self.result == "win")
+                    self.game.complete_minigame(score, success)
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "moving":
                 self.validate()
                 self.state = "stopped"
             elif self.state == "stopped":
                 # On click after finish, report score and leave
-                self.game.complete_minigame(getattr(self, "score", 0))
+                self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
 
     def update(self, dt):
         if self.state != "moving":
@@ -97,9 +101,10 @@ class CenterWordScene(Scene):
         hint = (
             "ESPACE (ou clic) pour ARRÊTER • M: Menu"
             if self.state == "moving"
-            else "R pour rejouer • M: Menu"
+            else "ESPACE/clic pour continuer • R pour rejouer • M: Menu"
         )
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         # Draw the word, with a fill mask up to cursor_x
         # Base word in desaturated color
@@ -145,5 +150,5 @@ class CenterWordScene(Scene):
             blit_text_center(screen, t1, HEIGHT // 2 - 10)
             blit_text_center(screen, t2, HEIGHT // 2 + 26)
             blit_text_center(screen, t3, HEIGHT // 2 + 50)
-            hint = self.ui_font.render("Clique pour continuer", True, SECONDARY_COLOR)
+            hint = self.ui_font.render("ESPACE ou clic pour continuer", True, SECONDARY_COLOR)
             blit_text_center(screen, hint, HEIGHT // 2 + 72)
