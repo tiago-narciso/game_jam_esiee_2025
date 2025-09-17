@@ -1,6 +1,7 @@
 import sys
 import pygame
 from .config import WIDTH, HEIGHT, FPS, TITLE
+from .utils import draw_80s_computer_frame
 
 
 class Scene:
@@ -74,6 +75,8 @@ class Game:
             if scene:
                 scene.update(dt)
                 scene.draw(self.game_surface)
+                # Apply 80s computer frame overlay
+                draw_80s_computer_frame(self.game_surface)
             
             # Scale the game surface to the screen size and blit it
             self.screen.blit(pygame.transform.scale(self.game_surface, self.screen.get_rect().size), (0, 0))
