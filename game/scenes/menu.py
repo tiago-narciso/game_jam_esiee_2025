@@ -1,7 +1,7 @@
 import pygame
 from ..core import Scene
-from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT
-from ..utils import blit_text_center, load_sound
+from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, WIDTH
+from ..utils import blit_text_center, load_sound, draw_pixel_button
 
 
 class MenuScene(Scene):
@@ -37,9 +37,16 @@ class MenuScene(Scene):
     def draw(self, screen):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Menu", True, PRIMARY_COLOR), 120)
+        
+        button_width = 300
+        button_height = 50
+        start_y = 220
+        gap = 15
+
         for i, (label, _) in enumerate(self.items):
-            col = ACCENT_COLOR if i == self.idx else PRIMARY_COLOR
-            blit_text_center(screen, self.item_font.render(label, True, col), 220 + i * 44)
+            rect = pygame.Rect((WIDTH - button_width) // 2, start_y + i * (button_height + gap), button_width, button_height)
+            draw_pixel_button(screen, rect, label, self.item_font, selected=(i == self.idx))
+
         blit_text_center(
             screen,
             self.hint_font.render(

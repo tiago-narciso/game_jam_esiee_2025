@@ -1,7 +1,7 @@
 import sys
 import pygame
 from .config import WIDTH, HEIGHT, FPS, TITLE
-from .utils import draw_80s_computer_frame
+from .utils import draw_80s_computer_frame, create_scanlines
 
 
 class Scene:
@@ -24,6 +24,7 @@ class Game:
         pygame.display.set_caption(TITLE)
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
         self.game_surface = pygame.Surface((WIDTH, HEIGHT))
+        self.scanlines = create_scanlines(WIDTH, HEIGHT)
         self.clock = pygame.time.Clock()
 
         try:
@@ -75,11 +76,15 @@ class Game:
             if scene:
                 scene.update(dt)
                 scene.draw(self.game_surface)
-                # Apply 80s computer frame overlay
-                draw_80s_computer_frame(self.game_surface)
             
-            # Scale the game surface to the screen size and blit it
-            self.screen.blit(pygame.transform.scale(self.game_surface, self.screen.get_rect().size), (0, 0))
+            # Add scanlines effect and computer frame to the game surface
+            self.game_surface.blit(self.scanlines, (0, 0))
+            draw_80s_computer_frame(self.game_surface)
+
+            # Scale the final game surface to the screen size and blit it
+            scaled_surface = pygame.transform.scale(self.game_surface, self.screen.get_rect().size)
+            self.screen.blit(scaled_surface, (0, 0))
+
             pygame.display.flip()
         pygame.quit()
         sys.exit(0)

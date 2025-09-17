@@ -50,95 +50,63 @@ def render_not_center_message(font) -> pygame.Surface:
 
 
 def draw_80s_computer_frame(surface: pygame.Surface) -> None:
-    """Draw an 80s computer monitor frame around the game surface.
-    
-    Features:
-    - Gray plastic bezel with rounded corners
-    - Thicker bottom section (chin) with power LED
-    - Screen area remains transparent for gameplay
-    - Retro computer aesthetic
-    """
+    """Draw a pixelated 80s computer monitor frame."""
     width, height = surface.get_size()
     
-    # Create overlay surface for the frame
     frame = pygame.Surface((width, height), pygame.SRCALPHA)
     
-    # Gray plastic colors
-    dark_gray = (60, 60, 65, 255)      # Main bezel
-    medium_gray = (80, 80, 85, 255)    # Inner accent
-    light_gray = (100, 100, 105, 255)  # Highlight
-    very_dark = (40, 40, 45, 255)      # Shadow
+    base_color = (139, 125, 123)
+    light_color = (191, 182, 178)
+    dark_color = (63, 54, 53)
     
-    # Main bezel frame (outer border)
-    bezel_thickness = 24
-    outer_rect = pygame.Rect(0, 0, width, height)
-    inner_rect = outer_rect.inflate(-bezel_thickness * 2, -bezel_thickness * 2)
+    bezel = 32
     
-    # Draw main bezel (only border, not filled)
-    pygame.draw.rect(frame, dark_gray, outer_rect, width=bezel_thickness, border_radius=20)
+    # Draw the main frame
+    pygame.draw.rect(frame, base_color, (0, 0, width, height))
     
-    # Inner accent line
-    pygame.draw.rect(frame, medium_gray, inner_rect, width=6, border_radius=0)
-    
-    # Highlight on top edge for 3D effect
-    highlight_rect = pygame.Rect(bezel_thickness, bezel_thickness, 
-                                width - bezel_thickness * 2, 8)
-    pygame.draw.rect(frame, light_gray, highlight_rect, border_radius=4)
-    
-    # Bottom chin section (thicker area)
-    chin_height = 50
-    chin_rect = pygame.Rect(bezel_thickness, height - chin_height - bezel_thickness,
-                           width - bezel_thickness * 2, chin_height)
-    
-    # Chin panel
-    pygame.draw.rect(frame, dark_gray, chin_rect, border_radius=0)
-    pygame.draw.rect(frame, medium_gray, chin_rect.inflate(-8, -8), width=3, border_radius=8)
-    
-    # Power LED (green dot on left side)
-    led_x = chin_rect.left + 30
-    led_y = chin_rect.centery
-    pygame.draw.circle(frame, (0, 255, 0, 200), (led_x, led_y), 4)
-    pygame.draw.circle(frame, (255, 255, 255, 100), (led_x, led_y), 2)
-    
-    # Power LED label
-    font = pygame.font.SysFont(None, 16)
-    led_text = font.render("PWR", True, (200, 200, 200, 180))
-    frame.blit(led_text, (led_x - 15, led_y + 8))
-    
-    # Speaker grille (right side)
-    grille_x = chin_rect.right - 80
-    grille_y = chin_rect.centery - 10
-    for i in range(8):
-        x = grille_x + i * 8
-        pygame.draw.rect(frame, (70, 70, 75, 150), 
-                        pygame.Rect(x, grille_y, 4, 20), border_radius=2)
-    
-    # Brand/model text area (center)
-    brand_rect = pygame.Rect(0, 0, 120, 20)
-    brand_rect.center = (chin_rect.centerx, chin_rect.centery)
-    pygame.draw.rect(frame, (50, 50, 55, 180), brand_rect, border_radius=4)
-    
-    # Model text
-    model_font = pygame.font.SysFont(None, 14, bold=True)
-    model_text = model_font.render("GAME JAM 2025", True, (180, 180, 180, 200))
-    text_rect = model_text.get_rect(center=brand_rect.center)
-    frame.blit(model_text, text_rect)
-    
-    # Corner screws (decorative)
-    screw_color = (120, 120, 125, 200)
-    screw_positions = [
-        # (bezel_thickness + 10, bezel_thickness + 10),
-        # (width - bezel_thickness - 10, bezel_thickness + 10),
-        (bezel_thickness + 10, height - bezel_thickness - 10),
-        (width - bezel_thickness - 10, height - bezel_thickness - 10)
-    ]
-    
-    for pos in screw_positions:
-        pygame.draw.circle(frame, screw_color, pos, 3)
-        pygame.draw.circle(frame, (160, 160, 165, 150), pos, 1)
-    
-    # Apply the frame to the surface
+    # Create the screen hole
+    pygame.draw.rect(frame, (0, 0, 0, 0), (bezel, bezel, width - bezel * 2, height - bezel * 2))
+
+    # Top and left highlights
+    pygame.draw.line(frame, light_color, (bezel, bezel), (width - bezel, bezel), 4)
+    pygame.draw.line(frame, light_color, (bezel, bezel), (bezel, height - bezel), 4)
+
+    # Bottom and right shadows
+    pygame.draw.line(frame, dark_color, (bezel, height - bezel), (width - bezel, height - bezel), 4)
+    pygame.draw.line(frame, dark_color, (width - bezel, bezel), (width - bezel, height - bezel), 4)
+
     surface.blit(frame, (0, 0))
+
+
+def create_scanlines(width, height, line_height=2, alpha=30):
+    """Create a surface with a scanline effect."""
+    scanline_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+    for y in range(0, height, line_height * 2):
+        pygame.draw.rect(scanline_surface, (0, 0, 0, alpha), (0, y, width, line_height))
+    return scanline_surface
+
+
+def draw_pixel_button(surface, rect, text, font, selected=False):
+    """Draw a pixel art style button."""
+    
+    base_color = (70, 80, 90)
+    light_color = (150, 160, 170)
+    dark_color = (40, 50, 60)
+    
+    if selected:
+        base_color = (90, 100, 110)
+        light_color = (40, 50, 60)
+        dark_color = (150, 160, 170)
+
+    pygame.draw.rect(surface, dark_color, rect)
+    pygame.draw.rect(surface, base_color, rect.inflate(-4, -4))
+    
+    pygame.draw.line(surface, light_color, (rect.left + 2, rect.top + 2), (rect.right - 3, rect.top + 2), 2)
+    pygame.draw.line(surface, light_color, (rect.left + 2, rect.top + 2), (rect.left + 2, rect.bottom - 3), 2)
+
+    text_surf = font.render(text, True, PRIMARY_COLOR)
+    text_rect = text_surf.get_rect(center=rect.center)
+    surface.blit(text_surf, text_rect)
 
 
 def draw_attempts(surface, game, pos=(None, 24)):
