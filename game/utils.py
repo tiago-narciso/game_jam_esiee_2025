@@ -46,7 +46,7 @@ _SOUND_ALIASES = {
 
 _DEFAULT_VOLUME = {
     # Lower SFX a bit; keep music moderate
-    "success.wav": 0.28,
+    "success.wav":  1.00,
     "fail.wav": 0.28,
     "click.wav": 0.18,
     "sarcastic.wav": 0.5,
