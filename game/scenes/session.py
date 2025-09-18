@@ -3,7 +3,7 @@ import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, HEIGHT, FONT_PATH
 from ..minigames import get_all_minigames
-from ..utils import blit_text_center
+from ..utils import blit_text_center, crt_shutdown_effect, crt_power_on_effect, get_game_area_rect
 from ..leaderboard import add_score
 from .leaderboard import LeaderboardScene
 
@@ -90,12 +90,16 @@ class SessionScene(Scene):
 
             if self.index >= len(self.queue):
                 # session complete → leaderboard
+                crt_shutdown_effect(self.game.screen, 500, self.game.game_surface, get_game_area_rect())
                 total = self.total_score
                 highlight_name = self.username or "Anonyme"
                 add_score(highlight_name, total)
                 # Close session, then show leaderboard with highlight
                 self.game.pop_scene()
-                self.game.push_scene(LeaderboardScene(self.game, highlight_username=highlight_name, highlight_score=total))
+                leaderboard_scene = LeaderboardScene(self.game, highlight_username=highlight_name, highlight_score=total)
+                self.game.push_scene(leaderboard_scene)
+                leaderboard_scene.draw(self.game.game_surface)
+                crt_power_on_effect(self.game.screen, 500, self.game.game_surface, get_game_area_rect())
                 return
             self._push_next_if_needed()
 
