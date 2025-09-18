@@ -1,6 +1,6 @@
 import os
 import pygame
-from .config import WIDTH, HEIGHT, SND_DIR, FONT_PATH, NOT_CENTER_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR, FRAME_BEZEL_THICKNESS, FRAME_CHIN_HEIGHT, GAME_WIDTH, GAME_HEIGHT
+from .config import WIDTH, HEIGHT, SND_DIR, FONT_PATH, NOT_CENTER_MSG, WIN_MSG, PRIMARY_COLOR, SECONDARY_COLOR, GOOD_COLOR, BAD_COLOR, FRAME_BEZEL_THICKNESS, FRAME_CHIN_HEIGHT, GAME_WIDTH, GAME_HEIGHT
 
 
 def clamp(value, min_value, max_value):
@@ -94,8 +94,13 @@ def get_music_path(name: str) -> str | None:
 
 
 def render_not_center_message(font) -> pygame.Surface:
-    """Render the shared 'not center' message with the given font."""
-    return font.render(NOT_CENTER_MSG, True, PRIMARY_COLOR)
+    """Render the shared 'not center' message with the given font in error color."""
+    return font.render(NOT_CENTER_MSG, True, BAD_COLOR)
+
+
+def render_win_message(font) -> pygame.Surface:
+    """Render the shared win message with the given font in success color."""
+    return font.render(WIN_MSG, True, GOOD_COLOR)
 
 
 def get_game_area_rect() -> pygame.Rect:
