@@ -146,6 +146,72 @@ def create_scanlines(width, height, line_height=2, alpha=30):
     return scanline_surface
 
 
+def crt_shutdown_effect(screen, duration, game_surface, game_area):
+    """Simulate a CRT screen shutting down."""
+    snapshot = game_surface.copy()
+    
+    # Shrink and brighten effect
+    for i in range(100, 0, -5):
+        height = int(game_area.height * (i / 100.0))
+        if height <= 0:
+            break
+        
+        scaled = pygame.transform.scale(snapshot, (game_area.width, height))
+        
+        # Redraw the full frame
+        frame_surface = pygame.Surface((WIDTH, HEIGHT))
+        draw_80s_computer_frame(frame_surface)
+        
+        # Blit the shrinking image
+        y = game_area.centery - height // 2
+        frame_surface.blit(scaled, (game_area.left, y))
+        
+        # Scale and draw to screen
+        screen.blit(pygame.transform.scale(frame_surface, screen.get_rect().size), (0, 0))
+        pygame.display.flip()
+        pygame.time.delay(duration // 20)
+
+    # Final white line
+    frame_surface = pygame.Surface((WIDTH, HEIGHT))
+    draw_80s_computer_frame(frame_surface)
+    pygame.draw.line(frame_surface, (255, 255, 255), (game_area.left, game_area.centery), (game_area.right, game_area.centery), 4)
+    screen.blit(pygame.transform.scale(frame_surface, screen.get_rect().size), (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(200)
+
+
+def crt_power_on_effect(screen, duration, final_surface, game_area):
+    """Simulate a CRT screen powering on."""
+    # Start with a white line
+    frame_surface = pygame.Surface((WIDTH, HEIGHT))
+    draw_80s_computer_frame(frame_surface)
+    pygame.draw.line(frame_surface, (255, 255, 255), (game_area.left, game_area.centery), (game_area.right, game_area.centery), 4)
+    screen.blit(pygame.transform.scale(frame_surface, screen.get_rect().size), (0, 0))
+    pygame.display.flip()
+    pygame.time.delay(200)
+
+    # Expand and fade in effect
+    for i in range(0, 101, 5):
+        height = int(game_area.height * (i / 100.0))
+        if height <= 0:
+            continue
+        
+        scaled = pygame.transform.scale(final_surface, (game_area.width, height))
+        
+        # Redraw the full frame
+        frame_surface = pygame.Surface((WIDTH, HEIGHT))
+        draw_80s_computer_frame(frame_surface)
+        
+        # Blit the expanding image
+        y = game_area.centery - height // 2
+        frame_surface.blit(scaled, (game_area.left, y))
+        
+        # Scale and draw to screen
+        screen.blit(pygame.transform.scale(frame_surface, screen.get_rect().size), (0, 0))
+        pygame.display.flip()
+        pygame.time.delay(duration // 20)
+
+
 def draw_attempts(surface, game, pos=(None, 24)):
     """Draw attempts HUD as small circles. pos: (x, y); x=None → right margin."""
     if getattr(game, "max_attempts_per_game", None) is None:
