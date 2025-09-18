@@ -2,7 +2,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND, FONT_PATH
-from ...utils import blit_text_center, clamp, draw_attempts
+from ...utils import blit_text_center, clamp, draw_attempts, load_sound
 
 
 class LifeMidpointScene(Scene):
@@ -34,6 +34,11 @@ class LifeMidpointScene(Scene):
         self.state = "aim"
         self.selected_year = None
         self.score = 0
+        # sounds
+        self.snd_success = load_sound("success.wav")
+        self.snd_fail = load_sound("fail.wav")
+        self.snd_click = load_sound("click.wav")
+        
         self.difficulty_multiplier = 1.0
 
     def year_to_x(self, year):
@@ -63,6 +68,8 @@ class LifeMidpointScene(Scene):
                 elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
                     self.validate_selection()
             elif self.state == "result" and e.key in (pygame.K_SPACE, pygame.K_RETURN):
+                # Don't play sounds when clicking to continue
+                self.validate_selection(play_sounds=False)
                 self.game.complete_minigame(getattr(self, "score", 0), self._is_success())
         elif e.type == pygame.KEYUP and self.state == "aim":
             if e.key in (pygame.K_LEFT, pygame.K_a):
@@ -88,7 +95,7 @@ class LifeMidpointScene(Scene):
             x = clamp(self.cursor_x + delta, self.timeline_rect.left, self.timeline_rect.right)
             self.cursor_x = x
 
-    def validate_selection(self):
+    def validate_selection(self, play_sounds=True):
         year = round(self.x_to_year(self.cursor_x))
         self.selected_year = int(year)
         error_years = abs(self.selected_year - self.target_year)
@@ -96,6 +103,19 @@ class LifeMidpointScene(Scene):
         precision = max(0.0, 1.0 - (error_years / (visible_span / 2)))
         self.score = int(100 * precision * self.difficulty_multiplier)
         self.state = "result"
+        # play sfx
+        if play_sounds:
+            try:
+                if self.snd_click:
+                    self.snd_click.play()
+                if self._is_success():
+                    if self.snd_success:
+                        self.snd_success.play()
+                else:
+                    if self.snd_fail:
+                        self.snd_fail.play()
+            except Exception:
+                pass
 
     def _is_success(self):
         if self.selected_year is None:
@@ -112,10 +132,10 @@ class LifeMidpointScene(Scene):
         pygame.draw.rect(screen, (40, 40, 60), self.timeline_rect)
         pygame.draw.rect(screen, PRIMARY_COLOR, self.timeline_rect, 2)
 
-        # Ticks and labels (birth, death, and padded bounds)
-        for year in (self.min_year, self.birth, self.death, self.max_year):
+        # Ticks and labels (birth and death only)
+        for year in (self.birth, self.death):
             x = self.year_to_x(year)
-            color = ACCENT_COLOR if year in (self.birth, self.death) else SECONDARY_COLOR
+            color = ACCENT_COLOR
             pygame.draw.line(screen, color, (x, self.timeline_rect.centery - 12), (x, self.timeline_rect.centery + 12), 3)
             label = self.large_font.render(str(year), True, color)
             screen.blit(label, label.get_rect(center=(x, self.timeline_rect.centery - 25)))
