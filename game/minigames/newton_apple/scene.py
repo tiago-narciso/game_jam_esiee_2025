@@ -87,16 +87,18 @@ class NewtonAppleScene(Scene):
 
     def draw(self, screen):
         screen.fill(BG_COLOR)
-        blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
-        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "ESPACE/clic pour continuer • R pour rejouer"
-        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
-        draw_attempts(screen, self.game, pos=(None, 26))
         
         # Draw ground behind other objects
         pygame.draw.rect(screen, self.tree_foliage_color, (0, self.ground_y, GAME_WIDTH, GAME_HEIGHT - self.ground_y))
 
         screen.blit(self.tree_img, self.tree_rect)
         screen.blit(self.newton_img, self.newton_rect)
+        
+        # Draw text on top of tree
+        blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
+        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "ESPACE/clic pour continuer • R pour rejouer"
+        blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
+        draw_attempts(screen, self.game, pos=(None, 26))
 
         apple_x = self.tree_rect.centerx + 30
         self.apple_rect.center = (apple_x, int(self.apple_y))
