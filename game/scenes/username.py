@@ -15,7 +15,7 @@ class UsernameScene(Scene):
         self.max_len = 16
         self.allowed_extra = set("-_ ")
 
-        self.trophy_img = load_image("assets/images/trophé.png", max_w=40, max_h=40)
+        self.trophy_img = load_image("assets/images/trophy.png", max_w=40, max_h=40)
         self.trophy_rect = self.trophy_img.get_rect(topright=(900, 20))
 
         self.close_img = load_image("assets/images/croix.png", max_w=40, max_h=40)
