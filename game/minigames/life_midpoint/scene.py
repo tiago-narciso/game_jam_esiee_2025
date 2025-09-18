@@ -126,6 +126,7 @@ class LifeMidpointScene(Scene):
         subtitle = f"Trouve l'année cible de {self.name}"
         blit_text_center(screen, self.title_font.render("Sur la frise: vise l'année", True, PRIMARY_COLOR), 70)
         blit_text_center(screen, self.ui_font.render(subtitle, True, SECONDARY_COLOR), 96)
+        blit_text_center(screen, self.ui_font.render("Utilise <- et ->", True, SECONDARY_COLOR), 120)
 
         # Timeline background
         pygame.draw.rect(screen, (40, 40, 60), self.timeline_rect)

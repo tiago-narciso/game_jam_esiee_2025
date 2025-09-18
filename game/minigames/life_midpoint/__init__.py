@@ -5,7 +5,7 @@ from .scene import LifeMidpointScene
 
 class LifeMidpointMiniGame(MiniGame):
     id = "life_midpoint"
-    display_name = "Au milieu de la vie"
+    display_name = "Au milieu de la vie use <- and ->"
 
     def create_initial_scene(self, game: Game) -> Scene:
         return LifeMidpointScene(game)

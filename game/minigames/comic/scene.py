@@ -252,5 +252,5 @@ class ComicScene(Scene):
             blit_text_center(screen, t2, GAME_HEIGHT // 2 + 26)
             
             # Affichage du score
-            t3 = self.ui_font.render(f"Score : {self.score}", True, ACCENT_COLOR)
+            t3 = self.ui_font.render(f"Score : {self.score}", True, PRIMARY_COLOR)
             blit_text_center(screen, t3, GAME_HEIGHT // 2 + 60)
