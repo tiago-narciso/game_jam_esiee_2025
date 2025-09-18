@@ -1,7 +1,7 @@
 import pygame
 from ...core import Scene
 from ...config import GAME_WIDTH, GAME_HEIGHT, ACCENT_COLOR, PRIMARY_COLOR, BG_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, FONT_PATH
-from ...utils import blit_text_center, load_sound, render_not_center_message, load_image, draw_attempts
+from ...utils import blit_text_center, load_sound, render_not_center_message, render_win_message, load_image, draw_attempts
 
 
 class NewtonAppleScene(Scene):
@@ -10,7 +10,8 @@ class NewtonAppleScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.title_font = pygame.font.Font(FONT_PATH, 38)
+        self.title_font_small = pygame.font.Font(FONT_PATH, 38)
         self.ui_font = pygame.font.Font(FONT_PATH, 22)
         self.tree_trunk_color = (139, 69, 19)
         self.tree_foliage_color = (34, 139, 34)
@@ -43,11 +44,7 @@ class NewtonAppleScene(Scene):
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
-            if e.key in (pygame.K_m, pygame.K_ESCAPE):
-                self.game.pop_scene()
-            elif e.key == pygame.K_r and self.state == "stopped":
-                self.reset()
-            elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
+            if e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "falling":
                     self.validate()
                     self.state = "stopped"
@@ -100,7 +97,7 @@ class NewtonAppleScene(Scene):
         
         # Draw text on top of tree
         blit_text_center(screen, self.title_font.render("Arrêtez la pomme au milieu de sa chute !", True, PRIMARY_COLOR), 60)
-        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "falling" else "ESPACE/clic pour continuer • R pour rejouer"
+        hint = "ESPACE/clic pour ARRÊTER " if self.state == "falling" else "ESPACE/clic pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
         draw_attempts(screen, self.game, pos=(None, 26))
 
@@ -115,10 +112,10 @@ class NewtonAppleScene(Scene):
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render("Parfait !", True, GOOD_COLOR)
+                t1 = render_win_message(self.title_font)
                 t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             else:
-                t1 = render_not_center_message(self.title_font)
+                t1 = render_not_center_message(self.title_font_small)
                 t2 = self.ui_font.render(f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, GAME_HEIGHT // 2 - 10)
             blit_text_center(screen, t2, GAME_HEIGHT // 2 + 26)

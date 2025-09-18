@@ -2,7 +2,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, CELEBRITIES, LIFE_KEY_SPEED, LIFE_TIMELINE_PADDING_YEARS, LIFE_TARGET_KIND, FONT_PATH
-from ...utils import blit_text_center, clamp, draw_attempts, load_sound
+from ...utils import blit_text_center, clamp, draw_attempts, load_sound, render_not_center_message, render_win_message
 
 
 class LifeMidpointScene(Scene):
@@ -12,6 +12,7 @@ class LifeMidpointScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.title_font = pygame.font.Font(FONT_PATH, 36)
+        self.title_font_small = pygame.font.Font(FONT_PATH, 34)
         self.ui_font = pygame.font.Font(FONT_PATH, 22)
         self.large_font = pygame.font.Font(FONT_PATH, 28)
         self.person = random.choice(CELEBRITIES)
@@ -38,7 +39,7 @@ class LifeMidpointScene(Scene):
         self.snd_success = load_sound("success.wav")
         self.snd_fail = load_sound("fail.wav")
         self.snd_click = load_sound("click.wav")
-        
+
         self.difficulty_multiplier = 1.0
 
     def year_to_x(self, year):
@@ -58,9 +59,7 @@ class LifeMidpointScene(Scene):
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
-            if e.key in (pygame.K_m, pygame.K_ESCAPE):
-                self.game.pop_scene()
-            elif self.state == "aim":
+            if self.state == "aim":
                 if e.key in (pygame.K_LEFT, pygame.K_a):
                     self.holding_left = True
                 elif e.key in (pygame.K_RIGHT, pygame.K_d):
@@ -152,7 +151,7 @@ class LifeMidpointScene(Scene):
 
 
         # Instructions
-        hint = "←/→ pour viser • ESPACE/clic pour valider • M: menu" if self.state == "aim" else "ESPACE pour continuer"
+        hint = "flèches directionnelles pour viser • ESPACE/clic pour valider" if self.state == "aim" else "ESPACE pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), HEIGHT - 26)
         draw_attempts(screen, self.game, pos=(None, 26))
 
@@ -166,14 +165,16 @@ class LifeMidpointScene(Scene):
             is_success = diff_years <= self.TOLERANCE_YEARS
             
             # Result title
-            result_text = "Parfait !" if is_success else "Presque !"
-            result_color = GOOD_COLOR if is_success else BAD_COLOR
-            blit_text_center(screen, self.title_font.render(result_text, True, result_color), HEIGHT // 2 - 60)
+            if is_success:
+                blit_text_center(screen, render_win_message(self.title_font), HEIGHT // 2 - 60)
+            else:
+                blit_text_center(screen, render_not_center_message(self.title_font_small), HEIGHT // 2 - 60)
             
             # Details
             chosen = self.large_font.render(f"Votre année: {self.selected_year}", True, PRIMARY_COLOR)
             exact_val = int(self.target_year) if isinstance(self.target_year, int) or float(self.target_year).is_integer() else self.target_year
             exact = self.large_font.render(f"Cible exacte: {exact_val}", True, PRIMARY_COLOR)
+            result_color = GOOD_COLOR if is_success else BAD_COLOR
             diff = self.large_font.render(f"Écart: {int(round(diff_years))} ans", True, result_color)
             score_s = self.large_font.render(f"Score: {self.score}", True, PRIMARY_COLOR)
             

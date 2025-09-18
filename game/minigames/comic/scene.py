@@ -3,7 +3,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import GAME_WIDTH, GAME_HEIGHT, PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, IMG_DIR, FONT_PATH
-from ...utils import blit_text_center, load_image, load_sound, draw_attempts
+from ...utils import blit_text_center, load_image, load_sound, draw_attempts, render_not_center_message, render_win_message
 
 
 def blit_fit(surface, img, rect):
@@ -39,6 +39,7 @@ class ComicScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.title_font_small = pygame.font.Font(FONT_PATH, 38)
         self.ui_font = pygame.font.Font(FONT_PATH, 22)
 
         # --- chargement images ---
@@ -128,11 +129,7 @@ class ComicScene(Scene):
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
-            if e.key in (pygame.K_m, pygame.K_ESCAPE):
-                self.game.pop_scene()
-            elif e.key == pygame.K_r and self.state == "stopped":
-                self.reset()
-            elif e.key == pygame.K_SPACE or e.key == pygame.K_RETURN:
+            if e.key == pygame.K_SPACE or e.key == pygame.K_RETURN:
                 if self.state == "moving":
                     self.validate()
                 elif self.state == "stopped":
@@ -228,7 +225,7 @@ class ComicScene(Scene):
         self.tile_rects = self.compute_layout()
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Quel est le milieu de l'histoire ?", True, PRIMARY_COLOR), 64)
-        blit_text_center(screen, self.ui_font.render("ESPACE/Click pour valider • M: Menu • R: Rejouer", True, SECONDARY_COLOR), 96)
+        blit_text_center(screen, self.ui_font.render("ESPACE/Click pour valider", True, SECONDARY_COLOR), 96)
         
         # Draw attempts HUD
         draw_attempts(screen, self.game, pos=(None, 26))
@@ -245,12 +242,12 @@ class ComicScene(Scene):
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render("Bravo ! Tu es bien au milieu de l'histoire", True, GOOD_COLOR)
-                t2 = self.ui_font.render("ESPACE/clic pour continuer • R pour rejouer • M pour menu", True, PRIMARY_COLOR)
+                t1 = render_win_message(self.title_font)
+                t2 = self.ui_font.render("ESPACE/clic pour continuer", True, PRIMARY_COLOR)
             else:
-                t1 = self.title_font.render("Vous n'êtes pas au milieu de l'histoire !!", True, BAD_COLOR)
+                t1 = render_not_center_message(self.title_font_small)
                 ans = os.path.basename(self.story_middle_path) if self.story_middle_path else "N/A"
-                t2 = self.ui_font.render(f"La case du milieu était : {ans}  •  ESPACE/clic pour continuer • R pour rejouer • M pour menu", True, PRIMARY_COLOR)
+                t2 = self.ui_font.render(f" ESPACE/clic pour continuer", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, GAME_HEIGHT // 2 - 10)
             blit_text_center(screen, t2, GAME_HEIGHT // 2 + 26)
             

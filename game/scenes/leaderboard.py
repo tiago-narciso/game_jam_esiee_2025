@@ -52,7 +52,7 @@ class LeaderboardScene(Scene):
         for idx, e in enumerate(top, start=1):
             is_me = self.highlight_username is not None and e.username == self.highlight_username and (self.highlight_score is None or e.score == self.highlight_score)
             color = ACCENT_COLOR if is_me else PRIMARY_COLOR
-            row = f"{idx:>2}. {e.username:<16} — {e.score}"
+            row = f"{idx:>2}. {e.username:<16}  {e.score}"
             blit_text_center(screen, self.row_font.render(row, True, color), y)
             y += 32
 
@@ -64,7 +64,7 @@ class LeaderboardScene(Scene):
                     rank = i
                     break
             if rank is not None and rank > 5:
-                line = f"#{rank} — {self.highlight_username} — {self.highlight_score}"
+                line = f"#{rank} / {self.highlight_username} / {self.highlight_score}"
                 blit_text_center(screen, self.row_font.render(line, True, ACCENT_COLOR), y + 16)
 
         # blit_text_center(
