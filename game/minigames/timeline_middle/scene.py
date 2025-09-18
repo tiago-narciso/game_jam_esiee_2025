@@ -4,7 +4,7 @@ import random
 import pygame
 from ...core import Scene
 from ...config import WIDTH, HEIGHT, PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, IMG_DIR, FONT_PATH
-from ...utils import blit_text_center, load_image, load_sound, render_not_center_message, draw_attempts
+from ...utils import blit_text_center, load_image, load_sound, render_not_center_message, render_win_message, draw_attempts
 from .data import IPHONE_MODELS
 
 
@@ -17,6 +17,7 @@ class TimelineMiddleScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.title_font = pygame.font.Font(FONT_PATH, 38)
+        self.title_font_small = pygame.font.Font(FONT_PATH, 36)
         self.ui_font = pygame.font.Font(FONT_PATH, 22)
         self.card_title_font = pygame.font.Font(FONT_PATH, 26)
         self.card_desc_font = pygame.font.Font(FONT_PATH, 24)
@@ -59,25 +60,21 @@ class TimelineMiddleScene(Scene):
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
-            if e.key in (pygame.K_m, pygame.K_ESCAPE):
-                self.game.pop_scene()
-            elif e.key == pygame.K_r and self.state == "stopped":
-                self._reset()
-            elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
+            if e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "scrolling":
                     self._validate(); self.state = "stopped"
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self._validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
-            elif self.state == "stopped":
-                score = getattr(self, "score", 0)
-                success = (self.result == "win")
-                self.game.complete_minigame(score, success)
         elif e.type == pygame.MOUSEBUTTONDOWN:
             if self.state == "scrolling":
                 self._validate(); self.state = "stopped"
             elif self.state == "stopped":
+                # Don't play sounds when clicking to continue
+                self._validate(play_sounds=False)
                 score = getattr(self, "score", 0)
                 self.game.complete_minigame(score, self.result == "win")
 
@@ -99,8 +96,8 @@ class TimelineMiddleScene(Scene):
         if loop_len > 0:
             self.scroll_x = self.scroll_x % loop_len
 
-    def _validate(self):
-        if self.snd_click:
+    def _validate(self, play_sounds=True):
+        if play_sounds and self.snd_click:
             self.snd_click.play()
         # Which card is at the screen center? Match the draw logic exactly
         card_span = self.CARD_W + self.GAP
@@ -116,11 +113,11 @@ class TimelineMiddleScene(Scene):
         # Win if selected year equals exact arithmetic midpoint
         if abs(selected_year - self.middle_year_value) == 0:
             self.result = "win"
-            if self.snd_success:
+            if play_sounds and self.snd_success:
                 self.snd_success.play()
         else:
             self.result = "lose"
-            if self.snd_fail:
+            if play_sounds and self.snd_fail:
                 self.snd_fail.play()
         # Score scaled by distance to arithmetic midpoint
         span = max(1.0, float(self.year_max - self.year_min))
@@ -132,7 +129,7 @@ class TimelineMiddleScene(Scene):
     def draw(self, screen):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Stoppe au milieu de l'histoire (iPhone)", True, PRIMARY_COLOR), 56)
-        hint = "ESPACE (ou clic) pour ARRÊTER • M: Menu" if self.state == "scrolling" else "ESPACE/clic pour continuer • R pour rejouer"
+        hint = "ESPACE/clic pour ARRÊTER" if self.state == "scrolling" else "ESPACE/clic pour continuer"
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 86)
         draw_attempts(screen, self.game, pos=(None, 26))
 
@@ -185,10 +182,10 @@ class TimelineMiddleScene(Scene):
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render("Parfait !", True, GOOD_COLOR)
+                t1 = render_win_message(self.title_font)
                 t2 = self.ui_font.render("Tu as stoppé au milieu de l'histoire.", True, PRIMARY_COLOR)
             else:
-                t1 = render_not_center_message(self.title_font)
+                t1 = render_not_center_message(self.title_font_small)
                 t2 = self.ui_font.render("Ce n'était pas le milieu exact.", True, PRIMARY_COLOR)
             blit_text_center(screen, t1, HEIGHT // 2 - 8)
             blit_text_center(screen, t2, HEIGHT // 2 + 24)

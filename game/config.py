@@ -33,6 +33,7 @@ FONT_PATH = os.path.join(FONT_DIR, "VCR_OSD_MONO.ttf")
 
 # Shared messages
 NOT_CENTER_MSG = "Vous n'êtes pas au centre de l'histoire."
+WIN_MSG = "Parfait !"
 
 
 

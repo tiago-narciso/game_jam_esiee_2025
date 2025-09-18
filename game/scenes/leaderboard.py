@@ -1,7 +1,7 @@
 import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
-from ..utils import blit_text_center
+from ..utils import blit_text_center, load_sound
 from ..leaderboard import load_entries, LeaderboardEntry
 from .username import UsernameScene
 
@@ -15,6 +15,17 @@ class LeaderboardScene(Scene):
         self.entries = load_entries()
         self.highlight_username = highlight_username
         self.highlight_score = highlight_score
+        self.snd_sarcastic = load_sound("sarcastic.wav")
+
+    def update(self, dt):
+        # Play sarcastic clap once on entering leaderboard
+        if getattr(self, "_played", False) is False:
+            self._played = True
+            if self.snd_sarcastic:
+                try:
+                    self.snd_sarcastic.play()
+                except Exception:
+                    pass
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
@@ -41,7 +52,7 @@ class LeaderboardScene(Scene):
         for idx, e in enumerate(top, start=1):
             is_me = self.highlight_username is not None and e.username == self.highlight_username and (self.highlight_score is None or e.score == self.highlight_score)
             color = ACCENT_COLOR if is_me else PRIMARY_COLOR
-            row = f"{idx:>2}. {e.username:<16} — {e.score}"
+            row = f"{idx:>2}. {e.username:<16}  {e.score}"
             blit_text_center(screen, self.row_font.render(row, True, color), y)
             y += 32
 
@@ -53,7 +64,7 @@ class LeaderboardScene(Scene):
                     rank = i
                     break
             if rank is not None and rank > 5:
-                line = f"#{rank} — {self.highlight_username} — {self.highlight_score}"
+                line = f"#{rank} / {self.highlight_username} / {self.highlight_score}"
                 blit_text_center(screen, self.row_font.render(line, True, ACCENT_COLOR), y + 16)
 
         # blit_text_center(

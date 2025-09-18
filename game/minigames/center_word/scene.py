@@ -2,7 +2,7 @@ import math
 import pygame
 from ...core import Scene
 from ...config import PRIMARY_COLOR, BG_COLOR, ACCENT_COLOR, GOOD_COLOR, BAD_COLOR, SECONDARY_COLOR, WIDTH, HEIGHT, FONT_PATH
-from ...utils import blit_text_center, load_sound, render_not_center_message, draw_attempts
+from ...utils import blit_text_center, load_sound, render_not_center_message, render_win_message, draw_attempts
 
 
 class CenterWordScene(Scene):
@@ -14,6 +14,7 @@ class CenterWordScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.title_font = pygame.font.Font(FONT_PATH, 40)
+        self.title_font_small = pygame.font.Font(FONT_PATH, 38)
         self.word_font = pygame.font.Font(FONT_PATH, 160)
         self.ui_font = pygame.font.Font(FONT_PATH, 22)
 
@@ -41,15 +42,13 @@ class CenterWordScene(Scene):
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:
-            if e.key in (pygame.K_m, pygame.K_ESCAPE):
-                self.game.pop_scene()
-            elif e.key == pygame.K_r and self.state == "stopped":
-                self.reset()
-            elif e.key in (pygame.K_SPACE, pygame.K_RETURN):
+            if e.key in (pygame.K_SPACE, pygame.K_RETURN):
                 if self.state == "moving":
                     self.validate()
                     self.state = "stopped"
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self.validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
@@ -58,7 +57,8 @@ class CenterWordScene(Scene):
                 self.validate()
                 self.state = "stopped"
             elif self.state == "stopped":
-                # On click after finish, report score and leave
+                # Don't play sounds when clicking to continue
+                self.validate(play_sounds=False)
                 self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
 
     def update(self, dt):
@@ -76,18 +76,18 @@ class CenterWordScene(Scene):
             self.cursor_x = self.min_x
             self.dir = +1
 
-    def validate(self):
-        if self.snd_click:
+    def validate(self, play_sounds=True):
+        if play_sounds and self.snd_click:
             self.snd_click.play()
         # Evaluate error relative to 50% fill
         self.error_px = abs(self.cursor_x - 0.5) * self.word_rect.width
         if abs(self.cursor_x - 0.5) * self.word_rect.width <= self.TOLERANCE:
             self.result = "win"
-            if self.snd_success:
+            if play_sounds and self.snd_success:
                 self.snd_success.play()
         else:
             self.result = "lose"
-            if self.snd_fail:
+            if play_sounds and self.snd_fail:
                 self.snd_fail.play()
         # Compute score: 100 max, linearly reduced by error, clamped to [0, 100]
         # 0 error -> 100, error == word width/2 -> 0
@@ -99,9 +99,9 @@ class CenterWordScene(Scene):
         screen.fill(BG_COLOR)
         blit_text_center(screen, self.title_font.render("Arrête la barre au centre du mot", True, PRIMARY_COLOR), 60)
         hint = (
-            "ESPACE (ou clic) pour ARRÊTER • M: Menu"
+            "Espace/clic pour ARRÊTER"
             if self.state == "moving"
-            else "ESPACE/clic pour continuer • R pour rejouer • M: Menu"
+            else "Espace/clic pour CONTINUER"
         )
         blit_text_center(screen, self.ui_font.render(hint, True, SECONDARY_COLOR), 92)
         draw_attempts(screen, self.game, pos=(None, 26))
@@ -135,14 +135,12 @@ class CenterWordScene(Scene):
             overlay.fill((0, 0, 0, 150))
             screen.blit(overlay, (0, 0))
             if self.result == "win":
-                t1 = self.title_font.render(
-                    "Parfait ! 50% atteint.", True, GOOD_COLOR
-                )
+                t1 = render_win_message(self.title_font)
                 t2 = self.ui_font.render(
                     f"Erreur: {int(self.error_px)} px (≤ {self.TOLERANCE}px)", True, PRIMARY_COLOR
                 )
             else:
-                t1 = render_not_center_message(self.title_font)
+                t1 = render_not_center_message(self.title_font_small)
                 t2 = self.ui_font.render(
                     f"Erreur: {int(self.error_px)} px (> {self.TOLERANCE}px)", True, PRIMARY_COLOR
                 )
