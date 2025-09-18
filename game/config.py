@@ -17,7 +17,7 @@ TITLE = "Game Jam 2025 – Vous n'êtes pas au centre de l'histoire (Pygame)"
 
 # --- Palette de couleurs ---
 # https://lospec.com/palette-list/sweetie-16
-BG_COLOR = (26, 28, 44)          # Fond sombre
+BG_COLOR = (0, 0, 170)       # Fond bleu clair retro
 PRIMARY_COLOR = (240, 240, 240)  # Texte principal
 SECONDARY_COLOR = (158, 162, 173) # Texte secondaire
 ACCENT_COLOR = (255, 107, 107)   # Accent (sélection, danger)
