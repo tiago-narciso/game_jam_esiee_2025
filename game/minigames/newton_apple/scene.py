@@ -52,6 +52,8 @@ class NewtonAppleScene(Scene):
                     self.validate()
                     self.state = "stopped"
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self.validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
@@ -60,6 +62,8 @@ class NewtonAppleScene(Scene):
                 self.validate()
                 self.state = "stopped"
             elif self.state == "stopped":
+                # Don't play sounds when clicking to continue
+                self.validate(play_sounds=False)
                 score = getattr(self, "score", 0)
                 self.game.complete_minigame(score, self.result == "win")
 
@@ -72,15 +76,15 @@ class NewtonAppleScene(Scene):
             self.validate()
             self.state = "stopped"
 
-    def validate(self):
-        if self.snd_click: self.snd_click.play()
+    def validate(self, play_sounds=True):
+        if play_sounds and self.snd_click: self.snd_click.play()
         self.error_px = abs(self.apple_y - self.target_y)
         if self.error_px <= self.TOLERANCE:
             self.result = "win"
-            if self.snd_success: self.snd_success.play()
+            if play_sounds and self.snd_success: self.snd_success.play()
         else:
             self.result = "lose"
-            if self.snd_fail: self.snd_fail.play()
+            if play_sounds and self.snd_fail: self.snd_fail.play()
         max_error_for_zero = (self.end_y - self.start_y) / 2
         raw = int(100 * max(0.0, 1.0 - (self.error_px / max_error_for_zero)))
         self.score = max(0, min(100, raw))

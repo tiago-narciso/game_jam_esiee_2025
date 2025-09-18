@@ -28,6 +28,7 @@ class SessionScene(Scene):
         self.current_best_score = 0
         # Attempts management (shared HUD state on game)
         self.game.current_attempts_left = None
+        # No error SFX on fail (disabled per request)
 
     def _push_next_if_needed(self):
         if self.index < len(self.queue) and not self.active:
@@ -72,6 +73,7 @@ class SessionScene(Scene):
                 if self.game.current_attempts_left is None:
                     self.game.current_attempts_left = self.game.max_attempts_per_game
                 self.game.current_attempts_left -= 1
+                # No error sound on fail
                 if self.game.current_attempts_left <= 0:
                     # out of attempts: advance
                     self.scores.append(self.current_best_score)

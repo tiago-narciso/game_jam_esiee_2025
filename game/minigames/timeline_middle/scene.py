@@ -67,6 +67,8 @@ class TimelineMiddleScene(Scene):
                 if self.state == "scrolling":
                     self._validate(); self.state = "stopped"
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self._validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
@@ -78,6 +80,8 @@ class TimelineMiddleScene(Scene):
             if self.state == "scrolling":
                 self._validate(); self.state = "stopped"
             elif self.state == "stopped":
+                # Don't play sounds when clicking to continue
+                self._validate(play_sounds=False)
                 score = getattr(self, "score", 0)
                 self.game.complete_minigame(score, self.result == "win")
 
@@ -99,8 +103,8 @@ class TimelineMiddleScene(Scene):
         if loop_len > 0:
             self.scroll_x = self.scroll_x % loop_len
 
-    def _validate(self):
-        if self.snd_click:
+    def _validate(self, play_sounds=True):
+        if play_sounds and self.snd_click:
             self.snd_click.play()
         # Which card is at the screen center? Match the draw logic exactly
         card_span = self.CARD_W + self.GAP
@@ -116,11 +120,11 @@ class TimelineMiddleScene(Scene):
         # Win if selected year equals exact arithmetic midpoint
         if abs(selected_year - self.middle_year_value) == 0:
             self.result = "win"
-            if self.snd_success:
+            if play_sounds and self.snd_success:
                 self.snd_success.play()
         else:
             self.result = "lose"
-            if self.snd_fail:
+            if play_sounds and self.snd_fail:
                 self.snd_fail.play()
         # Score scaled by distance to arithmetic midpoint
         span = max(1.0, float(self.year_max - self.year_min))

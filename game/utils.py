@@ -34,14 +34,63 @@ def load_image(path, max_w=720, max_h=400):
         return surf
 
 
+_SOUND_CACHE = {}
+_SOUND_ALIASES = {
+    # Logical → actual filenames present in assets/sounds
+    "success.wav": "success_bell-6776.wav",
+    "fail.wav": "error-08-206492.wav",
+    "click.wav": None,  # no dedicated click provided; stays None
+    "sarcastic.wav": "sarcastic-clapping-sound-186117.wav",
+    "lofi.wav": "lo-fi-alarm-clock-243766.wav",
+}
+
+_DEFAULT_VOLUME = {
+    # Lower SFX a bit; keep music moderate
+    "success.wav":  1.00,
+    "fail.wav": 0.28,
+    "click.wav": 0.18,
+    "sarcastic.wav": 0.5,
+    # music volume handled via mixer.music in core
+}
+
+
+def _resolve_sound_filename(name: str) -> str | None:
+    actual = _SOUND_ALIASES.get(name, name)
+    return actual
+
+
 def load_sound(name):
-    path = os.path.join(SND_DIR, name)
+    if name in _SOUND_CACHE:
+        return _SOUND_CACHE[name]
+    actual_name = _resolve_sound_filename(name)
+    if not actual_name:
+        _SOUND_CACHE[name] = None
+        return None
+    path = os.path.join(SND_DIR, actual_name)
     if os.path.isfile(path):
         try:
-            return pygame.mixer.Sound(path)
+            snd = pygame.mixer.Sound(path)
+            vol = _DEFAULT_VOLUME.get(name)
+            if isinstance(vol, (int, float)):
+                try:
+                    snd.set_volume(max(0.0, min(1.0, float(vol))))
+                except Exception:
+                    pass
+            _SOUND_CACHE[name] = snd
+            return snd
         except Exception:
+            _SOUND_CACHE[name] = None
             return None
+    _SOUND_CACHE[name] = None
     return None
+
+
+def get_music_path(name: str) -> str | None:
+    actual_name = _resolve_sound_filename(name)
+    if not actual_name:
+        return None
+    path = os.path.join(SND_DIR, actual_name)
+    return path if os.path.isfile(path) else None
 
 
 def render_not_center_message(font) -> pygame.Surface:

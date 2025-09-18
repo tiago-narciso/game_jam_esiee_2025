@@ -1,7 +1,7 @@
 import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
-from ..utils import blit_text_center
+from ..utils import blit_text_center, load_sound
 from ..leaderboard import load_entries, LeaderboardEntry
 from .username import UsernameScene
 
@@ -15,6 +15,17 @@ class LeaderboardScene(Scene):
         self.entries = load_entries()
         self.highlight_username = highlight_username
         self.highlight_score = highlight_score
+        self.snd_sarcastic = load_sound("sarcastic.wav")
+
+    def update(self, dt):
+        # Play sarcastic clap once on entering leaderboard
+        if getattr(self, "_played", False) is False:
+            self._played = True
+            if self.snd_sarcastic:
+                try:
+                    self.snd_sarcastic.play()
+                except Exception:
+                    pass
 
     def handle_event(self, e):
         if e.type == pygame.KEYDOWN:

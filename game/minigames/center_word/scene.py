@@ -50,6 +50,8 @@ class CenterWordScene(Scene):
                     self.validate()
                     self.state = "stopped"
                 elif self.state == "stopped":
+                    # Don't play sounds when clicking to continue
+                    self.validate(play_sounds=False)
                     score = getattr(self, "score", 0)
                     success = (self.result == "win")
                     self.game.complete_minigame(score, success)
@@ -58,7 +60,8 @@ class CenterWordScene(Scene):
                 self.validate()
                 self.state = "stopped"
             elif self.state == "stopped":
-                # On click after finish, report score and leave
+                # Don't play sounds when clicking to continue
+                self.validate(play_sounds=False)
                 self.game.complete_minigame(getattr(self, "score", 0), self.result == "win")
 
     def update(self, dt):
@@ -76,18 +79,18 @@ class CenterWordScene(Scene):
             self.cursor_x = self.min_x
             self.dir = +1
 
-    def validate(self):
-        if self.snd_click:
+    def validate(self, play_sounds=True):
+        if play_sounds and self.snd_click:
             self.snd_click.play()
         # Evaluate error relative to 50% fill
         self.error_px = abs(self.cursor_x - 0.5) * self.word_rect.width
         if abs(self.cursor_x - 0.5) * self.word_rect.width <= self.TOLERANCE:
             self.result = "win"
-            if self.snd_success:
+            if play_sounds and self.snd_success:
                 self.snd_success.play()
         else:
             self.result = "lose"
-            if self.snd_fail:
+            if play_sounds and self.snd_fail:
                 self.snd_fail.play()
         # Compute score: 100 max, linearly reduced by error, clamped to [0, 100]
         # 0 error -> 100, error == word width/2 -> 0

@@ -1,7 +1,7 @@
 import sys
 import pygame
 from .config import WIDTH, HEIGHT, FPS, TITLE, GAME_WIDTH, GAME_HEIGHT
-from .utils import draw_80s_computer_frame, get_game_area_rect, create_scanlines
+from .utils import draw_80s_computer_frame, get_game_area_rect, create_scanlines, get_music_path
 
 
 class Scene:
@@ -31,6 +31,16 @@ class Game:
             pygame.mixer.init()
         except Exception:
             pass
+        else:
+            # Start background lofi music if available
+            music_path = get_music_path("lofi.wav")
+            if music_path:
+                try:
+                    pygame.mixer.music.load(music_path)
+                    pygame.mixer.music.set_volume(0.35)
+                    pygame.mixer.music.play(-1)
+                except Exception:
+                    pass
 
         self.scenes = []
         self.running = True
