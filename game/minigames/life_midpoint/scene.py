@@ -123,7 +123,7 @@ class LifeMidpointScene(Scene):
 
     def draw(self, screen):
         screen.fill(BG_COLOR)
-        subtitle = f"Trouve l'année cible de {self.name}"
+        subtitle = f"Trouve le milieu de vie de {self.name}"
         blit_text_center(screen, self.title_font.render("Sur la frise: vise l'année", True, PRIMARY_COLOR), 70)
         blit_text_center(screen, self.ui_font.render(subtitle, True, SECONDARY_COLOR), 96)
         blit_text_center(screen, self.ui_font.render("Utilise <- et ->", True, SECONDARY_COLOR), 120)
