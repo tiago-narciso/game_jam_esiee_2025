@@ -7,6 +7,19 @@ def clamp(value, min_value, max_value):
     return max(min_value, min(max_value, value))
 
 
+def scale_mouse_to_game_surface(mouse_pos, screen_rect):
+    """Scale mouse coordinates from screen space to game surface space."""
+    # Scale from screen coordinates to frame coordinates
+    frame_x = mouse_pos[0] * WIDTH // screen_rect.width
+    frame_y = mouse_pos[1] * HEIGHT // screen_rect.height
+    
+    # Scale from frame coordinates to game surface coordinates
+    game_x = frame_x - FRAME_BEZEL_THICKNESS
+    game_y = frame_y - FRAME_BEZEL_THICKNESS
+    
+    return (game_x, game_y)
+
+
 def blit_text_center(surface, text_surface, y):
     rect = text_surface.get_rect(center=(GAME_WIDTH // 2, y))
     surface.blit(text_surface, rect)

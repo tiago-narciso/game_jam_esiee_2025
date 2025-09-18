@@ -1,7 +1,7 @@
 import pygame
 from ..core import Scene
 from ..config import PRIMARY_COLOR, SECONDARY_COLOR, BG_COLOR, ACCENT_COLOR, HEIGHT, FONT_PATH
-from ..utils import blit_text_center, load_image
+from ..utils import blit_text_center, load_image, scale_mouse_to_game_surface
 
 
 class UsernameScene(Scene):
@@ -24,11 +24,8 @@ class UsernameScene(Scene):
         if e.type == pygame.MOUSEBUTTONDOWN:
             # Scale mouse coordinates to match the game surface resolution
             screen_rect = self.game.screen.get_rect()
-            game_surface_rect = self.game.game_surface.get_rect()
-            scaled_pos = (
-                e.pos[0] * game_surface_rect.width // screen_rect.width,
-                e.pos[1] * game_surface_rect.height // screen_rect.height,
-            )
+            scaled_pos = scale_mouse_to_game_surface(e.pos, screen_rect)
+            
             if self.trophy_rect.collidepoint(scaled_pos):
                 from .leaderboard import LeaderboardScene
                 self.game.push_scene(LeaderboardScene(self.game))
