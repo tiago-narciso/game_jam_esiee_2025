@@ -51,4 +51,4 @@ CELEBRITIES = [
 # Life Midpoint minigame settings
 LIFE_KEY_SPEED = 220  # pixels per second left/right
 LIFE_TIMELINE_PADDING_YEARS = 20  # extra years before birth and after death
-LIFE_TARGET_KIND = "random"  # "random" or "midpoint" (for fallback/testing)
+LIFE_TARGET_KIND = "midpoint"  # "random" or "midpoint" (for fallback/testing)
